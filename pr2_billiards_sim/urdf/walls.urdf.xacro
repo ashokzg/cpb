@@ -1,0 +1,165 @@
+<robot name="pool_table"
+       xmlns:xacro="http://ros.org/wiki/xacro"
+       xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+       xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+       xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface">
+
+  <xacro:property name="table_width" value="1.2192"/> <!-- 4ft -->
+  <xacro:property name="table_length" value="2.4384"/> <!-- 8ft -->
+  <xacro:property name="table_height" value=".05"/>
+  <xacro:property name="side_pocket_dl" value="0.18"/>
+  <xacro:property name="corner_pocket_dw" value="0.08"/>
+  <xacro:property name="corner_pocket_dl" value="0.08"/>
+  <xacro:property name="cushion_height" value="0.05"/>
+  <xacro:property name="cushion_size" value="0.05"/>
+  <xacro:property name="leg_height" value="0.7"/>
+
+  <!-- x along the long side, y short side, z up and origin at surface of table top -->
+  <link name="wall1">
+    <inertial>
+      <mass value="200.0" />
+      <origin xyz="${table_length/2} ${table_width/2} ${-table_height/2}" rpy="0 0 0" />
+      <inertia  ixx="100.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"  izz="100.0" />
+    </inertial>
+    <visual>
+      <origin xyz="${table_length/2} ${table_width/2} ${-table_height/2}" rpy="0 0 0" />
+      <geometry>
+        <box size="9 0.1 ${leg_height*3}"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="${table_length/2} ${table_width/2} ${-table_height/2}" rpy="0 0 0" />
+      <geometry>
+        <box size="9 0.1 ${leg_height*3}"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="wall1">
+    <material>Gazebo/Wood</material>
+    <mu1>50.0</mu1>
+    <mu2>50.0</mu2>
+    <kp>1000000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+
+<!-- with origin at final approach -->
+  <joint name="wall1_joint" type="fixed" >
+    <parent link="wall1" />
+    <child link="wall2" />
+    <!--origin xyz="${-table_length/2} ${-table_width/2} ${-leg_height/2}" rpy="0 0 0" /-->
+    <origin xyz="-2.5 7 0" rpy="0 0 1.57" />
+  </joint>
+
+<!-- x along the long side, y short side, z up and origin at surface of table top -->
+  <link name="wall2">
+    <inertial>
+      <mass value="200.0" />
+      <origin xyz="${table_length/2} ${table_width/2} ${-table_height/2}" rpy="0 0 0" />
+      <inertia  ixx="100.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"  izz="100.0" />
+    </inertial>
+    <visual>
+      <origin xyz="${table_length/2} ${table_width/2} ${-table_height/2}" rpy="0 0 0" />
+      <geometry>
+        <box size="15 0.1 ${leg_height*3}"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="${table_length/2} ${table_width/2} ${-table_height/2}" rpy="0 0 0" />
+      <geometry>
+        <box size="15 0.1 ${leg_height*3}"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="wall2">
+    <material>Gazebo/Wood</material>
+    <mu1>50.0</mu1>
+    <mu2>50.0</mu2>
+    <kp>1000000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+
+<!-- with origin at final approach -->
+  <joint name="wall3_joint" type="fixed" >
+    <parent link="wall1" />
+    <child link="wall3" />
+    <!--origin xyz="${-table_length/2} ${-table_width/2} ${-leg_height/2}" rpy="0 0 0" /-->
+    <origin xyz="5 7 0" rpy="0 0 -1.57" />
+  </joint>
+
+<!-- x along the long side, y short side, z up and origin at surface of table top -->
+  <link name="wall3">
+    <inertial>
+      <mass value="200.0" />
+      <origin xyz="${table_length/2} ${table_width/2} ${-table_height/2}" rpy="0 0 0" />
+      <inertia  ixx="100.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"  izz="100.0" />
+    </inertial>
+    <visual>
+      <origin xyz="${table_length/2} ${table_width/2} ${-table_height/2}" rpy="0 0 0" />
+      <geometry>
+        <box size="15 0.1 ${leg_height*3}"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="${table_length/2} ${table_width/2} ${-table_height/2}" rpy="0 0 0" />
+      <geometry>
+        <box size="10 0.1 ${leg_height*3}"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="wall3">
+    <material>Gazebo/Wood</material>
+    <mu1>50.0</mu1>
+    <mu2>50.0</mu2>
+    <kp>1000000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+
+<!-- with origin at final approach -->
+  <joint name="wall4_joint" type="fixed" >
+    <parent link="wall1" />
+    <child link="wall4" />
+    <!--origin xyz="${-table_length/2} ${-table_width/2} ${-leg_height/2}" rpy="0 0 0" /-->
+    <origin xyz="0 15 0" rpy="0 0 0" />
+  </joint>
+
+<!-- x along the long side, y short side, z up and origin at surface of table top -->
+  <link name="wall4">
+    <inertial>
+      <mass value="200.0" />
+      <origin xyz="${table_length/2} ${table_width/2} ${-table_height/2}" rpy="0 0 0" />
+      <inertia  ixx="100.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"  izz="100.0" />
+    </inertial>
+    <visual>
+      <origin xyz="${table_length/2} ${table_width/2} ${-table_height/2}" rpy="0 0 0" />
+      <geometry>
+        <box size="9 0.1 ${leg_height*3}"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="${table_length/2} ${table_width/2} ${-table_height/2}" rpy="0 0 0" />
+      <geometry>
+        <box size="9 0.1 ${leg_height*3}"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="wall4">
+    <material>Gazebo/Wood</material>
+    <mu1>50.0</mu1>
+    <mu2>50.0</mu2>
+    <kp>1000000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+  <gazebo>
+    <!-- gazebo_ros_p3d for position groundtruth -->
+    <controller:gazebo_ros_p3d name="p3d_pool_table_controller" plugin="libgazebo_ros_p3d.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>100.0</updateRate>
+        <bodyName>pool_table</bodyName>
+        <topicName>pool_table_pose_ground_truth</topicName>
+        <frameName>base_link</frameName>
+        <interface:position name="p3d_pool_table_position"/>
+    </controller:gazebo_ros_p3d>
+    <static>true</static>
+  </gazebo>
+
+</robot>

@@ -1,0 +1,4 @@
+<launch>
+  <param name="pool_table_description" command="$(find xacro)/xacro.py '$(find pr2_billiards_sim)/urdf/table.urdf.xacro'" />
+  <node name="spawn_table" pkg="pr2_billiards_sim" type="wait_spawn.py" args="pool_table_description pool_table pool_table base_pose_ground_truth 1.0 -0.5 0.75 0 0 0" respawn="false" output="screen" />
+</launch>

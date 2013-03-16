@@ -1,0 +1,227 @@
+<robot name="pool_table"
+       xmlns:xacro="http://ros.org/wiki/xacro"
+       xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+       xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+       xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface">
+
+  <xacro:property name="table_width" value="1.2192"/> <!-- 4ft -->
+  <xacro:property name="table_length" value="2.4384"/> <!-- 8ft -->
+  <xacro:property name="table_height" value=".05"/>
+  <xacro:property name="side_pocket_dl" value="0.18"/>
+  <xacro:property name="corner_pocket_dw" value="0.08"/>
+  <xacro:property name="corner_pocket_dl" value="0.08"/>
+  <xacro:property name="cushion_height" value="0.05"/>
+  <xacro:property name="cushion_size" value="0.05"/>
+
+  <!-- x along the long side, y short side, z up and origin at surface of table top -->
+  <link name="pool_table">
+    <inertial>
+      <mass value="200.0" />
+      <origin xyz="${table_length/2} ${table_width/2} ${-table_height/2}" rpy="0 0 0" />
+      <inertia  ixx="100.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"  izz="100.0" />
+    </inertial>
+    <visual>
+      <origin xyz="${table_length/2} ${table_width/2} ${-table_height/2}" rpy="0 0 0" />
+      <geometry>
+        <box size="${table_length} ${table_width} ${table_height}"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="${table_length/2} ${table_width/2} ${-table_height/2}" rpy="0 0 0" />
+      <geometry>
+        <box size="${table_length} ${table_width} ${table_height}"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="pool_table">
+    <material>Gazebo/Green</material>
+    <mu1>1.0</mu1>
+    <mu2>1.0</mu2>
+  </gazebo>
+
+  <!-- with origin at final approach -->
+  <joint name="cushion_base_joint" type="fixed" >
+    <parent link="pool_table" />
+    <child link="cushion_base" />
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </joint>
+  <link name="cushion_base">
+    <inertial>
+      <mass value="200.0" />
+      <origin xyz="${-cushion_size/2} ${table_width/2} ${cushion_height/2}" rpy="0 0 0" />
+      <inertia  ixx="100.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"  izz="100.0" />
+    </inertial>
+    <visual>
+      <origin xyz="${-cushion_size/2} ${table_width/2} ${cushion_height/2}" rpy="0 0 0" />
+      <geometry>
+        <box size="${cushion_size} ${table_width-2*corner_pocket_dw} ${cushion_height}"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="${-cushion_size/2} ${table_width/2} ${cushion_height/2}" rpy="0 0 0" />
+      <geometry>
+        <box size="${cushion_size} ${table_width-2*corner_pocket_dw} ${cushion_height}"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="cushion_base">
+    <material>Gazebo/Blue</material>
+  </gazebo>
+
+  <joint name="cushion_crosswind_joint" type="fixed" >
+    <parent link="pool_table" />
+    <child link="cushion_crosswind" />
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </joint>
+  <link name="cushion_crosswind">
+    <inertial>
+      <mass value="200.0" />
+      <origin xyz="${table_length+cushion_size/2} ${table_width/2} ${cushion_height/2}" rpy="0 0 0" />
+      <inertia  ixx="100.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"  izz="100.0" />
+    </inertial>
+    <visual>
+      <origin xyz="${table_length+cushion_size/2} ${table_width/2} ${cushion_height/2}" rpy="0 0 0" />
+      <geometry>
+        <box size="${cushion_size} ${table_width-2*corner_pocket_dw} ${cushion_height}"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="${table_length+cushion_size/2} ${table_width/2} ${cushion_height/2}" rpy="0 0 0" />
+      <geometry>
+        <box size="${cushion_size} ${table_width-2*corner_pocket_dw} ${cushion_height}"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="cushion_crosswind">
+    <material>Gazebo/Blue</material>
+  </gazebo>
+
+  <joint name="cushion_entry_joint" type="fixed" >
+    <parent link="pool_table" />
+    <child link="cushion_entry" />
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </joint>
+  <link name="cushion_entry">
+    <inertial>
+      <mass value="200.0" />
+      <origin xyz="${0.75*(table_length-side_pocket_dl-2*corner_pocket_dl)+corner_pocket_dl+side_pocket_dl} ${table_width+cushion_size/2} ${cushion_height/2}" rpy="0 0 0" />
+      <inertia  ixx="100.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"  izz="100.0" />
+    </inertial>
+    <visual>
+      <origin xyz="${0.75*(table_length-side_pocket_dl-2*corner_pocket_dl)+corner_pocket_dl+side_pocket_dl} ${table_width+cushion_size/2} ${cushion_height/2}" rpy="0 0 0" />
+      <geometry>
+        <box size="${0.5*(table_length-side_pocket_dl-2*corner_pocket_dl)} ${cushion_size} ${cushion_height}"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="${0.75*(table_length-side_pocket_dl-2*corner_pocket_dl)+corner_pocket_dl+side_pocket_dl} ${table_width+cushion_size/2} ${cushion_height/2}" rpy="0 0 0" />
+      <geometry>
+        <box size="${0.5*(table_length-side_pocket_dl-2*corner_pocket_dl)} ${cushion_size} ${cushion_height}"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="cushion_entry">
+    <material>Gazebo/Blue</material>
+  </gazebo>
+
+  <joint name="cushion_downwind_joint" type="fixed" >
+    <parent link="pool_table" />
+    <child link="cushion_downwind" />
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </joint>
+  <link name="cushion_downwind">
+    <inertial>
+      <mass value="200.0" />
+      <origin xyz="${0.25*(table_length-side_pocket_dl-2*corner_pocket_dl)+corner_pocket_dl} ${table_width+cushion_size/2} ${cushion_height/2}" rpy="0 0 0" />
+      <inertia  ixx="100.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"  izz="100.0" />
+    </inertial>
+    <visual>
+      <origin xyz="${0.25*(table_length-side_pocket_dl-2*corner_pocket_dl)+corner_pocket_dl} ${table_width+cushion_size/2} ${cushion_height/2}" rpy="0 0 0" />
+      <geometry>
+        <box size="${0.5*(table_length-side_pocket_dl-2*corner_pocket_dl)} ${cushion_size} ${cushion_height}"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="${0.25*(table_length-side_pocket_dl-2*corner_pocket_dl)+corner_pocket_dl} ${table_width+cushion_size/2} ${cushion_height/2}" rpy="0 0 0" />
+      <geometry>
+        <box size="${0.5*(table_length-side_pocket_dl-2*corner_pocket_dl)} ${cushion_size} ${cushion_height}"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="cushion_downwind">
+    <material>Gazebo/Blue</material>
+  </gazebo>
+
+  <joint name="cushion_upwind_joint" type="fixed" >
+    <parent link="pool_table" />
+    <child link="cushion_upwind" />
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </joint>
+  <link name="cushion_upwind">
+    <inertial>
+      <mass value="200.0" />
+      <origin xyz="${0.75*(table_length-side_pocket_dl-2*corner_pocket_dl)+corner_pocket_dl+side_pocket_dl} ${-cushion_size/2} ${cushion_height/2}" rpy="0 0 0" />
+      <inertia  ixx="100.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"  izz="100.0" />
+    </inertial>
+    <visual>
+      <origin xyz="${0.75*(table_length-side_pocket_dl-2*corner_pocket_dl)+corner_pocket_dl+side_pocket_dl} ${-cushion_size/2} ${cushion_height/2}" rpy="0 0 0" />
+      <geometry>
+        <box size="${0.5*(table_length-side_pocket_dl-2*corner_pocket_dl)} ${cushion_size} ${cushion_height}"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="${0.75*(table_length-side_pocket_dl-2*corner_pocket_dl)+corner_pocket_dl+side_pocket_dl} ${-cushion_size/2} ${cushion_height/2}" rpy="0 0 0" />
+      <geometry>
+        <box size="${0.5*(table_length-side_pocket_dl-2*corner_pocket_dl)} ${cushion_size} ${cushion_height}"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="cushion_upwind">
+    <material>Gazebo/Blue</material>
+  </gazebo>
+
+  <joint name="cushion_final_joint" type="fixed" >
+    <parent link="pool_table" />
+    <child link="cushion_final" />
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </joint>
+  <link name="cushion_final">
+    <inertial>
+      <mass value="200.0" />
+      <origin xyz="${0.25*(table_length-side_pocket_dl-2*corner_pocket_dl)+corner_pocket_dl} ${-cushion_size/2} ${cushion_height/2}" rpy="0 0 0" />
+      <inertia  ixx="100.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"  izz="100.0" />
+    </inertial>
+    <visual>
+      <origin xyz="${0.25*(table_length-side_pocket_dl-2*corner_pocket_dl)+corner_pocket_dl} ${-cushion_size/2} ${cushion_height/2}" rpy="0 0 0" />
+      <geometry>
+        <box size="${0.5*(table_length-side_pocket_dl-2*corner_pocket_dl)} ${cushion_size} ${cushion_height}"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="${0.25*(table_length-side_pocket_dl-2*corner_pocket_dl)+corner_pocket_dl} ${-cushion_size/2} ${cushion_height/2}" rpy="0 0 0" />
+      <geometry>
+        <box size="${0.5*(table_length-side_pocket_dl-2*corner_pocket_dl)} ${cushion_size} ${cushion_height}"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="cushion_final">
+    <material>Gazebo/Blue</material>
+  </gazebo>
+
+
+
+
+  <gazebo>
+    <!-- gazebo_ros_p3d for position groundtruth -->
+    <controller:gazebo_ros_p3d name="p3d_pool_table_controller" plugin="libgazebo_ros_p3d.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>100.0</updateRate>
+        <bodyName>pool_table</bodyName>
+        <topicName>pool_table_pose_ground_truth</topicName>
+        <frameName>base_link</frameName>
+        <interface:position name="p3d_pool_table_position"/>
+    </controller:gazebo_ros_p3d>
+    <static>true</static>
+  </gazebo>
+
+</robot>

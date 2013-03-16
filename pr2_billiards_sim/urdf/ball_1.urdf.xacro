@@ -1,0 +1,15 @@
+<robot name="balls"
+       xmlns:xacro="http://ros.org/wiki/xacro"
+       xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+       xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+       xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface">
+
+  <include filename="$(find pr2_billiards_sim)/urdf/balls.urdf.xacro"/>
+  <xacro:property name="ball_radius" value="0.025" />
+  <xacro:property name="ball_mass" value="0.1" />
+  <xacro:property name="ball_I" value="0.001" />
+
+  <xacro:my_ball ball_name="ball_1" ball_radius="${ball_radius}" ball_mass="${ball_mass}" ball_I="${ball_I}" material="Gazebo/Red" >
+    <origin xyz="1 ${ball_radius/4} ${ball_radius}" rpy="0 0 0"/>
+  </xacro:my_ball>
+</robot>

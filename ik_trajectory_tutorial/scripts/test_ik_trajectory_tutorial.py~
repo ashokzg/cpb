@@ -16,7 +16,7 @@ def call_execute_cartesian_ik_trajectory(frame, positions, orientations):
     rospy.wait_for_service("execute_cartesian_ik_trajectory")
 
     #fill in the header (don't need seq)
-    header = rospy.Header()
+    header = roslib.msg.Header()
     header.frame_id = frame
     header.stamp = rospy.get_rostime()
 

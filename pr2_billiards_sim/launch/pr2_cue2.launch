@@ -1,0 +1,32 @@
+<launch>
+  <param name="robot_description" command="$(find xacro)/xacro.py '$(find pr2_billiards_sim)/urdf/pr2.urdf.xacro'" />
+  <node name="spawn_pr2" pkg="gazebo" type="spawn_model" args="-urdf -param robot_description -model pr2 -x 0.2 -Y -1.57 " respawn="false" output="screen" />
+  <!--node name="spawn_pr2" pkg="gazebo_tools" type="gazebo_model" args="-p robot_description spawn pr2 -x 0.2 -Y -1.57 " respawn="false" output="screen" /-->
+  <!-- start up empty world -->
+  <arg name="gui" default="true"/>
+  <arg name="throttled" default="false"/>
+  <arg name="paused" default="true"/>
+  
+  <include file="$(find gazebo_worlds)/launch/empty_world.launch">
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="throttled" value="$(arg throttled)" />
+    <arg name="paused" value="$(arg paused)" />
+  </include>
+
+<!-- push robot_description to factory and spawn robot in gazebo -->
+  <!--node name="spawn_pr2_model" pkg="gazebo" type="spawn_model" args="$(optenv ROBOT_INITIAL_POSE) -unpause -urdf -param robot_description -model pr2 -ros_namespace /gazebo" respawn="false" output="screen" /-->
+
+ <!-- default bringup script -->
+  <include file="$(find pr2_gazebo)/launch/pr2_bringup.launch" />
+
+  <!-- Load and Start Default Controllers -->
+  <include file="$(find pr2_controller_configuration_gazebo)/pr2_default_controllers.launch" />
+
+
+</launch>
+
+
+
+
+
+

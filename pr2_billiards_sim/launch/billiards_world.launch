@@ -1,0 +1,14 @@
+<launch>
+  <!-- start gazebo with an empty plane -->
+  <param name="/use_sim_time" value="true" />
+  <node name="gazebo" pkg="gazebo" type="gazebo" args="$(find pr2_billiards_sim)/worlds/billiards.world" respawn="false" output="screen"/>
+  <!--node name="gazebo" pkg="gazebo" type="gazebo" args="$(find gazebo_worlds)/worlds/empty.world" respawn="false" output="screen"/-->
+  <!--node name="gazebo" pkg="gazebo" type="gazebo" args="-u $(find gazebo_worlds)/worlds/wg_collada.world" respawn="false" output="screen"/-->
+  <!-- start gui -->
+  <node name="gazebo_gui" pkg="gazebo" type="gui" respawn="false" output="screen"/>
+
+  <include file="$(find pr2_billiards_sim)/launch/new_table.launch"/>
+  <include file="$(find pr2_billiards_sim)/launch/balls.launch"/>
+  <include file="$(find pr2_billiards_sim)/launch/pr2_bill.launch"/>
+  <include file="$(find pr2_billiards_sim)/launch/walls.launch"/>
+</launch>

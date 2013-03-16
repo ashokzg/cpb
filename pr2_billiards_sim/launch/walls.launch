@@ -1,0 +1,8 @@
+<launch>
+
+  <!-- send table urdf to param server -->
+  <param name="wall_description" command="$(find xacro)/xacro.py $(find pr2_billiards_sim)/urdf/walls.urdf.xacro" />
+
+  <!-- push table_description to factory and spawn robot in gazebo -->
+  <node name="spawn_wall" pkg="gazebo" type="spawn_model" args="-urdf -param wall_description -model wall_model -z 1.2 -x -2.0 -y -10.0" respawn="false" output="screen" />
+</launch>

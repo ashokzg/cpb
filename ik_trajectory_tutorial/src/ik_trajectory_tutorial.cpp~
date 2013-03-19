@@ -81,7 +81,7 @@ public:
     kinematics_msgs::GetPositionIK::Response ik_response;  
  
     ik_request.timeout = ros::Duration(5.0);
-    ik_request.ik_request.ik_seed_state.joint_state.name.push_back("r_shoulder_pan_joint");
+ik_request.ik_request.ik_seed_state.joint_state.name.push_back("r_shoulder_pan_joint");
     ik_request.ik_request.ik_seed_state.joint_state.name.push_back("r_shoulder_lift_joint");
     ik_request.ik_request.ik_seed_state.joint_state.name.push_back("r_upper_arm_roll_joint");
     ik_request.ik_request.ik_seed_state.joint_state.name.push_back("r_elbow_flex_joint");

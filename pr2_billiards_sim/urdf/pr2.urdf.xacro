@@ -180,6 +180,7 @@
     <origin xyz="0 0 ${lever_length}" rpy="0 0 0" />
     <axis xyz="0 1 0"/>
     <limit lower="0" upper="1.8" effort="10000" velocity="1.0"/>
+    <calibration reference_position="0.0"/>	
   </joint>
   <link name="cue_stick">
     <inertial>
@@ -216,6 +217,7 @@
     <origin xyz="0 0 ${cue_length-0.05}" rpy="0 0 0" />
     <axis xyz="0 0 1"/>
     <limit lower="-0.1" upper="0.1" effort="10000" velocity="1.0"/>
+    <calibration reference_position="0.0"/>	
   </joint>
   <link name="bridge">
     <inertial>
@@ -271,4 +273,17 @@
     <turnGravityOff>false</turnGravityOff>
     <selfCollide>true</selfCollide>
   </gazebo>
+
+<transmission name="lever_cue" type="SimpleTransmission">
+<actuator name="lc"/>
+<joint name="cue_ball_joint"/>
+<mechanicalReduction>1.0</mechanicalReduction>
+</transmission>
+
+<transmission name="cue_bridge" type="SimpleTransmission">
+<actuator name="cb"/>
+<joint name="cue_bridge_joint"/>
+<mechanicalReduction>1.0</mechanicalReduction>
+</transmission>
+
 </robot>

@@ -10,7 +10,6 @@
   <url>http://ros.org/wiki/simple_trajectory</url>
   <depend package="actionlib"/>
   <depend package="roscpp"/>
-  <depend package="rospy"/>
   <depend package="pr2_controllers_msgs"/>
   <depend package="joint_states_listener"/>
 

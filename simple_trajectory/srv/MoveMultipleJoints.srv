@@ -1,0 +1,16 @@
+#arm => 0:right 1:left
+bool arm
+
+# Joint Angles
+#0:shoulder_pan_joint
+#1:shoulder_lift_joint
+#2:shoulder_roll_joint
+#3:elbow_flex_joint
+#4:forearm_roll_joint
+#5:wrist_flex_joint
+#6:wrist_roll_joint
+float64[] jointAngles
+
+---
+# If the configuration is accepted. Really doesn't mean anything
+bool success

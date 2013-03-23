@@ -1,0 +1,18 @@
+<package>
+  <description brief="joint_states_listener">
+
+     joint_states_listener
+
+  </description>
+  <author>TeamB</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/joint_states_listener</url>
+  <depend package="rospy"/>
+  <depend package="sensor_msgs"/>
+  <export>
+     <cpp cflags=" -I${prefix}/srv_gen/cpp/include"/>
+  </export>
+</package>
+
+

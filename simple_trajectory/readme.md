@@ -4,6 +4,7 @@ Pre-start:
 ---------  
 roslaunch pr2_billiards_world billiards_world.launch  
 rosrun joint_states_listener joint_states_listener.py  
+rosrun simple_trajectory simple_trajectory  
 
 Usage:  
 -----  
@@ -11,7 +12,6 @@ Command:
 rosrun simple_trajectory moveOneJoint.py 1 2 3 0.5  
   
 Description:  
-  
 rosrun simple_trajectory moveOneJoint.py ARMSIDE JOINTINDEX JOINTANGLE JOINTVELOCITY   
 ARMSIDE:  
 0: Right  

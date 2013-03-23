@@ -5,7 +5,7 @@
 #include "simple_trajectory/MoveJoint.h"
 #include "simple_trajectory/MoveMultipleJoints.h"
 //#include "joint_states_listener/ReturnJointStates.h"
-#include "/home/teamb/cpb/joint_states_listener/srv_gen/cpp/include/joint_states_listener/ReturnJointStates.h"
+#include "../../joint_states_listener/srv_gen/cpp/include/joint_states_listener/ReturnJointStates.h"
 
 typedef actionlib::SimpleActionClient< pr2_controllers_msgs::JointTrajectoryAction > TrajClient;
 

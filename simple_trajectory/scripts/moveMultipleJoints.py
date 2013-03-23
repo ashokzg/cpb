@@ -12,7 +12,7 @@ def move_joint_client(side, ang):
     rospy.wait_for_service('move_multiple_joints')
     print "Found service"
     try:
-        move_joint = rospy.ServiceProxy('move_multiple_joint', MoveMultipleJoints)
+        move_joint = rospy.ServiceProxy('move_multiple_joints', MoveMultipleJoints)
         success = move_joint(side, ang)
         return success
     except rospy.ServiceException, e:

@@ -8,7 +8,7 @@ rosrun simple_trajectory simple_trajectory
 
 Usage:  
 -----  
-Command:  
+Command: Move one joint  
 rosrun simple_trajectory moveOneJoint.py 1 2 3 0.5  
   
 Description:  
@@ -32,3 +32,12 @@ Angle in radians
 
 JOINTVELOCITY:  
 Angluar Velocity  
+
+
+Command: Move multiple joints  
+rosrun simple_trajectory moveMultipleJoints.py 1 0.5 -1 3 -0.5 0 -1 2  
+
+Description:  
+rosrun simple_trajectory moveMultipleJoints.py ARMSIDE JOINT_0_ANGLE JOINT_1_ANGLE ... JOINT_6_ANGLE  
+ARMSIDE: same as above  
+JOINT_x_ANGLE: angles for the joints described above  

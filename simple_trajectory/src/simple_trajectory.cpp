@@ -173,7 +173,6 @@ public:
 								  "x_forearm_roll_joint",
 								  "x_wrist_flex_joint",
 								  "x_wrist_roll_joint"};
-	  ROS_INFO("1");
 	  // Change the joint names as per the side
 	  for(int i = 0; i < 7; i++)
 	  {
@@ -184,7 +183,6 @@ public:
 		  jointStates.request.name[i] = jointNames[i];
 	  }
 
-	  ROS_INFO("Camer");
 	  if(curJointAngles_client.call(jointStates))
 	  {
 		  for(int i = 0; i < 7; i++)
@@ -300,7 +298,7 @@ public:
         goalRef.trajectory.points[ind].velocities[j] = 0.5;
       }
 
-      ROS_INFO("All set to move");
+      ROS_INFO("Moving multiple joints");
       // To be reached 1 second after starting along the trajectory
       goalRef.trajectory.points[ind].time_from_start = ros::Duration(1.0);
 

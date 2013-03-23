@@ -42,7 +42,7 @@ public:
     // tell the action client that we want to spin a thread by default
     traj_client_left = new TrajClient("l_arm_controller/joint_trajectory_action", true);
     // wait for action server to come up
-    while(!traj_client_right->waitForServer(ros::Duration(5.0))){
+    while((!traj_client_right->waitForServer(ros::Duration(5.0)) || (!traj_client_left->waitForServer(ros::Duration(5.0))))){
       ROS_INFO("Waiting for the joint_trajectory_action server");
     }
     addJointNames();
@@ -326,7 +326,7 @@ int main(int argc, char** argv)
 
 
   // Start the trajectory
-  arm.startTrajectory(RobotArm::RIGHT_ARM, arm.armExtensionTrajectory());
+  //arm.startTrajectory(RobotArm::RIGHT_ARM, arm.armExtensionTrajectory());
   ros::spin();
   return 0;
 

@@ -9,6 +9,7 @@ roslaunch simple_trajectory simple_trajectory.launch
 Usage:  
 -----  
 Command: Move one joint  
+---------------------------  
 rosrun simple_trajectory moveOneJoint.py ARMSIDE JOINTINDEX JOINTANGLE JOINTVELOCITY
   
 Description:  
@@ -33,18 +34,20 @@ Angle in radians
 
 JOINTVELOCITY:  
 Angluar Velocity  
----------------------------  
+
 
 Command: Move multiple joints  
+---------------------------  
 rosservice call move_multiple_joints ARMSIDE [JOINT_0_ANGLE, JOINT_1_ANGLE, ... JOINT_6_ANGLE]  
 
 Description:  
 e.g.: rosservice call move_multiple_joints 0 [0.5, -1, 3, -0.5, 0, -1, 2]  
 ARMSIDE: same as above  
 JOINT_x_ANGLE: angles for the joints described above  
---------------------------  
+
   
 Command: Take a shot  
+---------------------------  
 rosservice take_shot TAKE  
 
   

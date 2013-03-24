@@ -1,3 +1,4 @@
+<!--xml-->
 <launch>
 
   <!-- send table urdf to param server -->

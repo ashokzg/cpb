@@ -4,8 +4,13 @@
 #include <actionlib/client/simple_action_client.h>
 #include "simple_trajectory/MoveJoint.h"
 #include "simple_trajectory/MoveMultipleJoints.h"
+#include "simple_trajectory/TakeShot.h"
 //#include "joint_states_listener/ReturnJointStates.h"
 #include "../../joint_states_listener/srv_gen/cpp/include/joint_states_listener/ReturnJointStates.h"
+#include <iostream>
+
+
+
 
 typedef actionlib::SimpleActionClient< pr2_controllers_msgs::JointTrajectoryAction > TrajClient;
 
@@ -26,6 +31,9 @@ private:
 	  JOINT_EFFORT,
 	  NO_OF_JOINT_PARAMETERS
   } jointParameters_t;
+  double shotStart[7], shotEnd[7];
+  bool shotStartValid, shotEndValid;
+  ros::NodeHandle nh;
 public:
   typedef enum
   {
@@ -35,8 +43,9 @@ public:
   } armSide_t;
 
   //! Initialize the action client and wait for action server to come up
-  RobotArm(ros::NodeHandle n)
+  RobotArm(ros::NodeHandle& n)
   {
+
     // tell the action client that we want to spin a thread by default
     traj_client_right = new TrajClient("r_arm_controller/joint_trajectory_action", true);
     // tell the action client that we want to spin a thread by default
@@ -46,6 +55,12 @@ public:
       ROS_INFO("Waiting for the joint_trajectory_action server");
     }
     addJointNames();
+    initShotParameters();
+    ROS_INFO("Shot parameters\nStart   End");
+    for(int i = 0; i < 7; i++)
+    {
+    	ROS_INFO("%f %f", shotStart[i], shotEnd[i]);
+    }
     curJointAngles_client = n.serviceClient<joint_states_listener::ReturnJointStates>("return_joint_states");
   }
 
@@ -308,6 +323,73 @@ public:
       //we are done with service
       return true;
   }
+
+  bool moveMultipleJoints(armSide_t side, double (&config)[7], double vel)
+  {
+	//Limiting arm to boolean. O for right, 1 for left
+	pr2_controllers_msgs::JointTrajectoryGoal& goalRef = (side == RIGHT_ARM)? r_goal: l_goal;
+
+
+	// We will have two waypoints in this goal trajectory
+	goalRef.trajectory.points.resize(1);
+	// First trajectory point
+	// Positions
+	int ind = 0;
+	// Resize position and velocities
+	goalRef.trajectory.points[ind].positions.resize(7);
+	goalRef.trajectory.points[ind].velocities.resize(7);
+	//Initialize the position and velocity to current values so that we dont change any other joint
+	for (size_t j = 0; j < 7; ++j)
+	{
+	goalRef.trajectory.points[ind].positions[j] = config[j];
+	  goalRef.trajectory.points[ind].velocities[j] = vel;
+	}
+
+	// To be reached 1 second after starting along the trajectory
+	goalRef.trajectory.points[ind].time_from_start = ros::Duration(1.0);
+
+	startTrajectory(side, goalRef);
+
+	//we are done with service
+	return true;
+  }
+
+
+  void initShotParameters(void)
+  {
+	  std::string jointIdxStr;
+	  std::stringstream strStream;
+	  shotStartValid = true;
+	  shotEndValid = true;
+	  for(int i =0; i < 7; i++)
+	  {
+		  strStream<<i;
+		  jointIdxStr = strStream.str();
+		  strStream.str(std::string());
+		  if(!ros::param::get("simple_trajectory/ShotStart/j"+jointIdxStr, shotStart[i]))
+		  {
+			  shotStartValid = false;
+			  ROS_INFO("WARNING: Shot start configuration not configured");
+		  }
+		  if(!ros::param::get("simple_trajectory/ShotEnd/j"+jointIdxStr, shotEnd[i]))
+		  {
+			  shotEndValid = false;
+			  ROS_INFO("WARNING: Shot end configuration not configured");
+		  }
+	  }
+  }
+
+  bool takeShot(simple_trajectory::TakeShot::Request  &req,
+           simple_trajectory::TakeShot::Response &res)
+  {
+	  ROS_INFO("Taking shot, here we go");
+	  moveMultipleJoints(RIGHT_ARM, (req.shotAction == 0)? shotStart: shotEnd, 0.5);
+	  usleep(1500000);
+	  moveMultipleJoints(RIGHT_ARM, (req.shotAction == 0)? shotEnd: shotStart, 0.5);
+	  res.success = true;
+	  return true;
+  }
+
 };
 
 
@@ -321,7 +403,7 @@ int main(int argc, char** argv)
   RobotArm arm(n);
   ros::ServiceServer jnt = n.advertiseService("move_one_joint", &RobotArm::moveJoint, &arm);
   ros::ServiceServer mjnt = n.advertiseService("move_multiple_joints", &RobotArm::moveMultJoints, &arm);
-
+  ros::ServiceServer shotSrv = n.advertiseService("take_shot", &RobotArm::takeShot, &arm);
 
   // Start the trajectory
   //arm.startTrajectory(RobotArm::RIGHT_ARM, arm.armExtensionTrajectory());

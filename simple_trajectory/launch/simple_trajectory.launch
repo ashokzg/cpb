@@ -1,0 +1,5 @@
+<!--xml-->
+<launch>
+    <rosparam command="load" file="$(find simple_trajectory)/launch/shotParameters.yaml" />  
+    <node pkg="simple_trajectory" type="simple_trajectory" name="simple_trajectory" />
+</launch>

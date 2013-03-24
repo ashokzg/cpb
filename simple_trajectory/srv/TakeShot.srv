@@ -1,0 +1,7 @@
+#Shot state
+#0: Play the shot
+#1: Retract
+uint32 shotAction
+---
+#Should return success or failure. But actually means nothing
+bool success

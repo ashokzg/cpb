@@ -202,7 +202,7 @@ public:
 	  {
 		  for(int i = 0; i < 7; i++)
 		  {
-			  ROS_INFO("Joint %d: %f", i, jointStates.response.position[i]);
+			  ROS_DEBUG("Joint %d: %f", i, jointStates.response.position[i]);
 			  jointParameters[JOINT_POSITION][i] = jointStates.response.position[i];
 			  jointParameters[JOINT_VELOCITY][i] = jointStates.response.velocity[i];
 			  jointParameters[JOINT_EFFORT][i] = jointStates.response.effort[i];
@@ -382,15 +382,41 @@ public:
   bool takeShot(simple_trajectory::TakeShot::Request  &req,
            simple_trajectory::TakeShot::Response &res)
   {
+	  initShotParameters();
 	  ROS_INFO("Taking shot, here we go");
-	  moveMultipleJoints(RIGHT_ARM, (req.shotAction == 0)? shotStart: shotEnd, 0.5);
-	  usleep(1500000);
-	  moveMultipleJoints(RIGHT_ARM, (req.shotAction == 0)? shotEnd: shotStart, 0.5);
+	  double curJointAngles[7];
+	  if(shotStartValid == false)
+	  {
+		  ROS_ERROR("Shot start position not configured");
+		  res.success = false;
+		  return false;
+	  }
+	  //For retracting, just stay in the current configuration
+	  //shotAction description=> 0:TakeShot 1:Retract Cue stick
+	  if(req.shotAction == 0)
+	  {
+		  moveMultipleJoints(RIGHT_ARM, shotStart, 0.5);
+		  //Wait for movement to complete
+		  usleep(1500000);
+	  }
+	  //Rotate only the wrist
+	  getCurJointAngles(RIGHT_ARM, curJointAngles);
+	  curJointAngles[6] += (req.shotAction == 0)? -0.2: 0.2;
+	  //Apply the action
+	  moveMultipleJoints(RIGHT_ARM, curJointAngles, 0.5);
 	  res.success = true;
 	  return true;
   }
 
+  void getCurJointAngles(armSide_t side, double (&curJointAngles)[7])
+  {
+	  float curJointVals[NO_OF_JOINT_PARAMETERS][7];
+	  getCurrentJointVales(side, curJointVals);
+	  for(int i = 0; i < 7; i++)
+		  curJointAngles[i] = curJointVals[JOINT_POSITION][i];
+  }
 };
+
 
 
 

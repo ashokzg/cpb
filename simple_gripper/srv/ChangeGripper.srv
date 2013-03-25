@@ -1,0 +1,4 @@
+uint32 arm
+uint32 openClose
+---
+bool success

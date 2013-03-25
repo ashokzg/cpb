@@ -5,15 +5,15 @@
        xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
        xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface">
 
-  <xacro:property name="table_width" value="1.2192"/> <!-- 4ft -->
-  <xacro:property name="table_length" value="2.4384"/> <!-- 8ft -->
+  <xacro:property name="table_width" value="1.3592"/> <!-- 4ft -->
+  <xacro:property name="table_length" value="2.4784"/> <!-- 8ft -->
   <xacro:property name="table_height" value=".05"/>
-  <xacro:property name="side_pocket_dl" value="0.18"/>
-  <xacro:property name="corner_pocket_dw" value="0.08"/>
-  <xacro:property name="corner_pocket_dl" value="0.08"/>
-  <xacro:property name="cushion_height" value="0.05"/>
-  <xacro:property name="cushion_size" value="0.05"/>
-  <xacro:property name="leg_height" value="0.7"/>
+  <xacro:property name="side_pocket_dl" value="0.14"/>
+  <xacro:property name="corner_pocket_dw" value="0.12"/>
+  <xacro:property name="corner_pocket_dl" value="0.12"/>
+  <xacro:property name="cushion_height" value="0.035"/>
+  <xacro:property name="cushion_size" value="0.12"/>
+  <xacro:property name="leg_height" value="0.72"/>
 
   <!-- x along the long side, y short side, z up and origin at surface of table top -->
   <link name="pool_table">
@@ -37,8 +37,8 @@
   </link>
   <gazebo reference="pool_table">
     <material>Gazebo/Green</material>
-    <mu1>1.0</mu1>
-    <mu2>1.0</mu2>
+    <mu1>100.0</mu1>
+    <mu2>100.0</mu2>
   </gazebo>
 
    <!-- with origin at final approach -->

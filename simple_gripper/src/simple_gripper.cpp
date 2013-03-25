@@ -8,7 +8,9 @@ typedef actionlib::SimpleActionClient<pr2_controllers_msgs::Pr2GripperCommandAct
 
 class Gripper{
 private:
-  GripperClient* gripper_client_;  
+  GripperClient* gripper_r;
+  GripperClient* gripper_l;
+  GripperClient* gripper_client_ ;  
 
 public:
   //Action client initialization
@@ -16,7 +18,9 @@ public:
 
     //Initialize the client for the Action interface to the gripper controller
     //and tell the action client that we want to spin a thread by default
-    gripper_client_ = new GripperClient("l_gripper_controller/gripper_action", true);
+    gripper_l = new GripperClient("l_gripper_controller/gripper_action", true);
+    gripper_r = new GripperClient("r_gripper_controller/gripper_action", true);
+    gripper_client_ = gripper_r;
     //gripper_client_ = new GripperClient("l_gripper_controller/gripper_action", true);
     
     //wait for the gripper action server to come up 
@@ -63,6 +67,10 @@ public:
            simple_gripper::ChangeGripper::Response &res)
   {
     ROS_INFO("Camer");
+    if(req.arm == 0)
+         gripper_client_ = gripper_r;
+    else
+         gripper_client_ = gripper_l;        
     if(req.openClose == 0)
         open();
     else
@@ -82,9 +90,8 @@ int main(int argc, char** argv){
   ros::NodeHandle n;
 
   ros::ServiceServer grip = n.advertiseService("gripper", &Gripper::changeGrip, &gripper);
-  gripper.open();
-  gripper.close();
-    ros::spin();
+
+  ros::spin();
 
   return 0;
 }

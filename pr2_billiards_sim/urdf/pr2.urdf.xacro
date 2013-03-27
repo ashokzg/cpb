@@ -165,7 +165,12 @@
   </link>
   <gazebo reference="lever_stick">
     <material>Gazebo/Wood</material>
+<<<<<<< HEAD
     <turnGravityOff>true</turnGravityOff>
+=======
+    <turnGravityOff>false</turnGravityOff>	
+    <selfCollide>true</selfCollide>
+>>>>>>> ca2440fcd2ee8b481865029ed631a3577d57df79
   </gazebo>
 
 
@@ -206,7 +211,12 @@
   </link>
   <gazebo reference="cue_stick">
     <material>Gazebo/Wood</material>
+<<<<<<< HEAD
     <turnGravityOff>true</turnGravityOff>
+=======
+    <turnGravityOff>false</turnGravityOff>
+    <selfCollide>true</selfCollide>
+>>>>>>> ca2440fcd2ee8b481865029ed631a3577d57df79
   </gazebo>
 
   <xacro:property name="bridge_mass" value="0.1"/>
@@ -231,19 +241,24 @@
     <visual>
       <origin xyz="-0.06 0 0" rpy="0 0 0" />
       <geometry>
-        <box size="0.10 0.04 0.005"/>
+        <box size="0.10 0.04 0.01"/>
       </geometry>
     </visual>
     <collision>
       <origin xyz="-0.06 0 0" rpy="0 0 0" />
       <geometry>
-        <box size="0.10 0.03 0.005"/>
+        <box size="0.10 0.04 0.01"/>
       </geometry>
     </collision>
   </link>
   <gazebo reference="bridge">
     <material>Gazebo/White</material>
     <turnGravityOff>true</turnGravityOff>
+<<<<<<< HEAD
+=======
+    <mu1>100.0</mu1>
+    <mu2>100.0</mu2>		
+>>>>>>> ca2440fcd2ee8b481865029ed631a3577d57df79
     <selfCollide>true</selfCollide>
   </gazebo>
 
@@ -283,11 +298,11 @@
 <mechanicalReduction>1.0</mechanicalReduction>
 </transmission>
 
-<transmission name="cue_bridge" type="SimpleTransmission">
+<!--transmission name="cue_bridge" type="SimpleTransmission">
 <actuator name="cb"/>
 <joint name="cue_bridge_joint"/>
 <mechanicalReduction>1.0</mechanicalReduction>
-</transmission>
+</transmission-->
 
 <transmission name="lever_ball_bridge" type="SimpleTransmission">
 <actuator name="lb"/>

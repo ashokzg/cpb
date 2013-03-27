@@ -7,13 +7,13 @@ import rospy
 from simple_trajectory.srv import *
 
 
-def move_joint_client(side, ang):
+def move_joint_client(side, joint, angle, vel):
     print "Waiting for service"
     rospy.wait_for_service('move_one_joint')
     print "Found service"
     try:
-        move_joints = rospy.ServiceProxy('move_one_joint', MoveJoint)
-        success = move_joints(side, ang)
+        move_joint = rospy.ServiceProxy('move_one_joint', MoveJoint)
+        success = move_joint(side, joint, angle, vel)
         return success
     except rospy.ServiceException, e:
         print "Service call failed: %s"%e

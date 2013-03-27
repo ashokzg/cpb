@@ -1,0 +1,162 @@
+<?xml version="1.0"?>
+<robot name="stick"
+       xmlns:xacro="http://ros.org/wiki/xacro"
+       xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+       xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+       xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface">
+
+  <xacro:property name="lever_length" value="0.5"/>
+  <xacro:property name="lever_radius" value="0.0075"/>
+  <xacro:property name="lever_mass" value="0.1"/>
+  <xacro:property name="lever_ixx" value="0.1"/>
+  <xacro:property name="lever_iyy" value="0.1"/>
+  <xacro:property name="lever_izz" value="0.01"/>
+  <xacro:property name="lever_offset_z" value="0.00"/>
+  
+  <link name="lever_stick">
+    <inertial>
+      <mass value="${lever_mass}" />
+      <origin xyz="0 0 0.15" rpy="0 0 0" />
+      <inertia  ixx="${lever_ixx}" ixy="0.0"  ixz="0.0"  iyy="${lever_iyy}"  iyz="0.0"  izz="${lever_izz}" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0.15" rpy="0 0 0" />
+      <geometry>
+        <cylinder length="${lever_length}" radius="${lever_radius}"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.15" rpy="0 0 0" />
+      <geometry>
+        <cylinder length="${lever_length}" radius="${lever_radius}"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="lever_stick">
+    <material>Gazebo/Wood</material>
+    <turnGravityOff>true</turnGravityOff>
+  </gazebo>
+
+
+  <xacro:property name="cue_length" value="1.0"/>
+  <xacro:property name="cue_radius" value="0.0065"/>
+  <xacro:property name="cue_mass" value="0.01"/>
+  <xacro:property name="cue_ixx" value="0.01"/>
+  <xacro:property name="cue_iyy" value="0.01"/>
+  <xacro:property name="cue_izz" value="0.001"/>
+  <xacro:property name="cue_offset_z" value="0.03"/>
+
+  <joint name="cue_ball_joint" type="revolute" >
+    <parent link="lever_stick" />
+    <child link="cue_stick" />
+    <origin xyz="0 0 ${lever_length-0.1}" rpy="0 1.57 0" />
+    <axis xyz="0 1 0"/>
+    <limit lower="-0.5" upper="0.5" effort="10000" velocity="1.0"/>
+    <calibration reference_position="0.0"/>	
+  </joint>
+  <link name="cue_stick">
+    <inertial>
+      <mass value="${cue_mass}" />
+      <origin xyz="0 0 ${cue_length/2+cue_offset_z}" rpy="0 0 0" />
+      <inertia  ixx="${cue_ixx}" ixy="0.0"  ixz="0.0"  iyy="${cue_iyy}"  iyz="0.0"  izz="${cue_izz}" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 ${cue_offset_z+cue_length/2}" rpy="0 0 0" />
+      <geometry>
+        <cylinder length="${cue_length}" radius="${cue_radius}"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 ${cue_offset_z+cue_length/2}" rpy="0 0 0" />
+      <geometry>
+        <cylinder length="${cue_length}" radius="${cue_radius}"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="cue_stick">
+    <material>Gazebo/Wood</material>
+    <turnGravityOff>true</turnGravityOff>
+  </gazebo>
+
+  <xacro:property name="bridge_mass" value="0.1"/>
+  <xacro:property name="bridge_ixx" value="0.1"/>
+  <xacro:property name="bridge_iyy" value="0.1"/>
+  <xacro:property name="bridge_izz" value="0.1"/>
+
+  <joint name="cue_bridge_joint" type="prismatic" >
+    <parent link="cue_stick" />
+    <child link="bridge" />
+    <origin xyz="0 0 ${cue_length-0.05}" rpy="1.57 0 0" />
+    <axis xyz="0 1 0"/>
+    <limit lower="-0.1" upper="0.1" effort="10000" velocity="1.0"/>
+    <calibration reference_position="0.0"/>	
+  </joint>
+  <link name="bridge">
+    <inertial>
+      <mass value="${bridge_mass}" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <inertia  ixx="${bridge_ixx}" ixy="0.0"  ixz="0.0"  iyy="${bridge_iyy}"  iyz="0.0"  izz="${bridge_izz}" />
+    </inertial>
+    <visual>
+      <origin xyz="-0.06 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="0.10 0.04 0.005"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="-0.06 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="0.10 0.03 0.005"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="bridge">
+    <material>Gazebo/White</material>
+    <turnGravityOff>true</turnGravityOff>
+    <selfCollide>true</selfCollide>
+  </gazebo>
+
+  <joint name="cue_bridge_bottom_joint" type="fixed" >
+    <parent link="bridge" />
+    <child link="bridge_bottom" />
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </joint>
+  <link name="bridge_bottom">
+    <inertial>
+      <mass value="${bridge_mass}" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <inertia  ixx="${bridge_ixx}" ixy="0.0"  ixz="0.0"  iyy="${bridge_iyy}"  iyz="0.0"  izz="${bridge_izz}" />
+    </inertial>
+    <visual>
+      <origin xyz="0.02 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="0.02 0.03 0.005"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0.02 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="0.02 0.03 0.005"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="bridge_bottom">
+    <material>Gazebo/Red</material>
+    <turnGravityOff>true</turnGravityOff>
+    <selfCollide>true</selfCollide>
+  </gazebo>
+
+<transmission name="lever_cue" type="SimpleTransmission">
+<actuator name="lc"/>
+<joint name="cue_ball_joint"/>
+<mechanicalReduction>1.0</mechanicalReduction>
+</transmission>
+
+<transmission name="cue_bridge" type="SimpleTransmission">
+<actuator name="cb"/>
+<joint name="cue_bridge_joint"/>
+<mechanicalReduction>1.0</mechanicalReduction>
+</transmission>
+
+
+</robot>

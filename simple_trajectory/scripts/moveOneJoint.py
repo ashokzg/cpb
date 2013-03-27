@@ -34,5 +34,5 @@ if __name__ == "__main__":
     print side, joint, angle, vel
     ret = move_joint_client(side, joint, angle, vel)
     print "Current Joint configuration:\n----------------------"
-    for j in ret.curPosition:
-        print j
+    #for j in ret.curPosition:
+    #    print j

@@ -1,0 +1,17 @@
+<package>
+  <description brief="bridge_mover">
+
+     bridge_mover
+
+  </description>
+  <author>TeamB</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/bridge_mover</url>
+  <depend package="rospy"/>
+  <depend package="gazebo"/>
+  <depend package="tf"/>
+
+</package>
+
+

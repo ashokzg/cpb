@@ -1,10 +1,11 @@
 <launch>
   <param name="ball_0_description" command="$(find xacro)/xacro.py $(find pr2_billiards_sim)/urdf/ball_0.urdf.xacro" />
   <param name="ball_1_description" command="$(find xacro)/xacro.py $(find pr2_billiards_sim)/urdf/ball_1.urdf.xacro" />
+  <param name="stick_description" command="$(find xacro)/xacro.py $(find pr2_billiards_sim)/urdf/stick.urdf.xacro" />
 
 
   <!-- push table_description to factory and spawn robot in gazebo -->
  <node name="spawn_ball0" pkg="gazebo" type="spawn_model" args="-urdf -param ball_0_description -model ball0 -z 1.2 -x -0.5 -y -3.8 " respawn="false" output="screen" />
   <node name="spawn_ball1" pkg="gazebo" type="spawn_model" args="-urdf -param ball_1_description -model ball1 -z 1.3 -x -0.4 -y -3.6" respawn="false" output="screen" />
-
+  <node name="spawn_stick" pkg="gazebo" type="spawn_model" args="-urdf -param stick_description -model stick -z 1 -x -0.2 -y -1.2" respawn="false" output="screen" />    
 </launch>

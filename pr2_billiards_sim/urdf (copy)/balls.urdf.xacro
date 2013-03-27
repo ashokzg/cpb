@@ -1,0 +1,50 @@
+<robot name="balls"
+       xmlns:xacro="http://ros.org/wiki/xacro"
+       xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+       xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+       xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface">
+
+  <xacro:property name="ball_radius" value="0.0285" />
+  <xacro:property name="ball_mass" value="0.17" />
+  <xacro:property name="ball_I" value="0.000055233" />  <!-- 2*m*r*r/5 -->
+
+  <xacro:macro name="my_ball" params="ball_name ball_radius ball_mass ball_I *origin material">
+    <link name="${ball_name}">
+      <inertial>
+        <mass value="${ball_mass}" />
+        <origin xyz="0 0 0" /> 
+        <inertia  ixx="${ball_I}" ixy="0.0"  ixz="0.0"  iyy="${ball_I}"  iyz="0.0"  izz="${ball_I}" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <sphere radius="${ball_radius}" />
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <sphere radius="${ball_radius}" />
+        </geometry>
+      </collision>
+    </link>
+    <gazebo reference="${ball_name}">
+      <material>${material}</material>
+      <turnGravityOff>false</turnGravityOff>
+      <selfCollide>true</selfCollide>
+      <mu1>0.1</mu1>
+      <mu2>0.1</mu2>
+    </gazebo>
+    <gazebo>
+      <!-- gazebo_ros_p3d for position groundtruth -->
+      <controller:gazebo_ros_p3d name="p3d_${ball_name}_controller" plugin="libgazebo_ros_p3d.so">
+          <alwaysOn>true</alwaysOn>
+          <updateRate>100.0</updateRate>
+          <bodyName>${ball_name}</bodyName>
+          <topicName>${ball_name}_pose_ground_truth</topicName>
+          <frameName>base_link</frameName>
+          <interface:position name="p3d_${ball_name}_position"/>
+      </controller:gazebo_ros_p3d>
+    </gazebo>
+  </xacro:macro>
+</robot>

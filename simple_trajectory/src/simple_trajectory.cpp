@@ -263,7 +263,7 @@ public:
 
       //Update the relevant joint with the user given values
       //WARNING: No limit checking here
-      goalRef.trajectory.points[ind].positions[jointIdx] = req.movAngle;
+      goalRef.trajectory.points[ind].positions[jointIdx] += req.movAngle;
       goalRef.trajectory.points[ind].velocities[jointIdx] = req.movVel;
       ROS_INFO("All set to move");
       // To be reached 1 second after starting along the trajectory

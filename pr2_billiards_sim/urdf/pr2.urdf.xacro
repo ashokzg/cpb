@@ -13,7 +13,7 @@
   <include filename="$(find pr2_description)/urdf/upper_arm_v0/upper_arm.urdf.xacro" />
   <include filename="$(find pr2_description)/urdf/forearm_v0/forearm.urdf.xacro" />
   <!-- PR2 gripper -->
-  <include filename="$(find pr2_description)/urdf/gripper_v0/gripper.urdf.xacro" />
+  <include filename="$(find pr2_billiards_sim)/urdf/ashok/gripper_v0/gripper.urdf.xacro" />
   <!-- PR2 head -->
   <include filename="$(find pr2_description)/urdf/head_v0/head.urdf.xacro" />
   <!-- PR2 tilting laser mount -->
@@ -21,7 +21,7 @@
   <!-- PR2 torso -->
   <include filename="$(find pr2_description)/urdf/torso_v0/torso.urdf.xacro" />
   <!-- PR2 base -->
-  <include filename="$(find pr2_description)/urdf/base_v0/base.urdf.xacro" />
+  <include filename="$(find pr2_billiards_sim)/urdf/ashok/base_v0/base.urdf.xacro" />
   <!-- Head sensors -->
   <include filename="$(find pr2_description)/urdf/sensors/head_sensor_package.urdf.xacro" />
   <!-- Camera sensors -->
@@ -127,7 +127,7 @@
     <origin xyz=".135 0 .044" rpy="${M_PI/2} ${-32.25*M_PI/180} 0" />
   </xacro:wge100_camera_v0>
 
-
+<!--
   <xacro:property name="lever_length" value="0.5"/>
   <xacro:property name="lever_radius" value="0.0075"/>
   <xacro:property name="lever_mass" value="0.1"/>
@@ -136,10 +136,13 @@
   <xacro:property name="lever_izz" value="0.01"/>
   <xacro:property name="lever_offset_z" value="0.03"/>
   
-  <joint name="lever_ball_joint" type="fixed" >
+  <joint name="lever_ball_joint" type="revolute" >
     <parent link="r_gripper_palm_link" />
     <child link="lever_stick" />
     <origin xyz="0.2 0 0" rpy="0 0 1.56" />
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.14" upper="3.14" effort="10000" velocity="1.0"/>
+    <calibration reference_position="0.0"/>	
   </joint>
   <link name="lever_stick">
     <inertial>
@@ -162,11 +165,11 @@
   </link>
   <gazebo reference="lever_stick">
     <material>Gazebo/Wood</material>
-    <turnGravityOff>false</turnGravityOff>
+    <turnGravityOff>true</turnGravityOff>
   </gazebo>
 
 
-  <xacro:property name="cue_length" value="1.47"/>
+  <xacro:property name="cue_length" value="1.0"/>
   <xacro:property name="cue_radius" value="0.0065"/>
   <xacro:property name="cue_mass" value="0.01"/>
   <xacro:property name="cue_ixx" value="0.01"/>
@@ -177,9 +180,9 @@
   <joint name="cue_ball_joint" type="revolute" >
     <parent link="lever_stick" />
     <child link="cue_stick" />
-    <origin xyz="-0.4 0 ${lever_length}" rpy="0 0 0" />
+    <origin xyz="0 0 ${lever_length}" rpy="0 0 0" />
     <axis xyz="0 1 0"/>
-    <limit lower="0.0" upper="1.8" effort="10000" velocity="1.0"/>
+    <limit lower="-3.14" upper="3.14" effort="10000" velocity="1.0"/>
     <calibration reference_position="0.0"/>	
   </joint>
   <link name="cue_stick">
@@ -203,7 +206,7 @@
   </link>
   <gazebo reference="cue_stick">
     <material>Gazebo/Wood</material>
-    <turnGravityOff>false</turnGravityOff>
+    <turnGravityOff>true</turnGravityOff>
   </gazebo>
 
   <xacro:property name="bridge_mass" value="0.1"/>
@@ -240,7 +243,7 @@
   </link>
   <gazebo reference="bridge">
     <material>Gazebo/White</material>
-    <turnGravityOff>false</turnGravityOff>
+    <turnGravityOff>true</turnGravityOff>
     <selfCollide>true</selfCollide>
   </gazebo>
 
@@ -270,7 +273,7 @@
   </link>
   <gazebo reference="bridge_bottom">
     <material>Gazebo/Red</material>
-    <turnGravityOff>false</turnGravityOff>
+    <turnGravityOff>true</turnGravityOff>
     <selfCollide>true</selfCollide>
   </gazebo>
 
@@ -285,5 +288,12 @@
 <joint name="cue_bridge_joint"/>
 <mechanicalReduction>1.0</mechanicalReduction>
 </transmission>
+
+<transmission name="lever_ball_bridge" type="SimpleTransmission">
+<actuator name="lb"/>
+<joint name="lever_ball_joint"/>
+<mechanicalReduction>1.0</mechanicalReduction>
+</transmission>
+-->
 
 </robot>

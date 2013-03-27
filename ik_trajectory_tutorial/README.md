@@ -4,7 +4,7 @@ Gripper pose for right arm
 - Rotation: in Quaternion [-0.000, -0.111, -0.000, 0.994]
             in RPY [-0.001, -0.222, -0.000]
 
- rosservice call /execute_cartesian_ik_trajectory -- "{header: { frame_id: /base_link}, poses: [{position: [0.120, -0.290, 0.430], orientation:[-0.000, -0.111, -0.000, 0.994]}]}"
+rosservice call /execute_cartesian_ik_trajectory -- "{header: { frame_id: /base_link}, poses: [{position: [0.180, -0.290, 0.430], orientation:[0, 0, 0, 1]}]}"
 
 Service call for left arm IK for reaching the bridge!
 
@@ -18,3 +18,5 @@ TF between bridge and gripper
             in RPY [-2.028, 0.000, -0.000]
 Use a static TF to publish to dummy frame. IK left gripper to dummy frame!
 
+For shot:
+rosservice call move_one_joint -- 0 6 -0.5 1

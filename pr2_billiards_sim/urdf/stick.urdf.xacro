@@ -85,12 +85,79 @@
 
   <joint name="cue_bridge_joint" type="prismatic" >
     <parent link="cue_stick" />
-    <child link="bridge" />
-    <origin xyz="0 0 ${cue_length-0.05}" rpy="1.57 0 0" />
-    <axis xyz="0 1 0"/>
+    <child link="link_virtual1" />
+    <origin xyz="0 0 ${cue_length-0.05}" rpy="0 0 0" />
+    <axis xyz="0 0 1"/>
     <limit lower="-0.1" upper="0.1" effort="10000" velocity="1.0"/>
     <calibration reference_position="0.0"/>	
   </joint>
+  
+  <link name="link_virtual1">
+   <inertial>
+      <mass value="${cue_mass/1000}" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <inertia  ixx="0" ixy="0.0"  ixz="0.01"  iyy="0.01"  iyz="0.0"  izz="0.01" />
+    </inertial>
+    <visual>
+      <origin xyz="0.0 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder length="0.01" radius="0.01"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0.01 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder length="0.01" radius="0.01"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="link_virtual1">
+    <material>Gazebo/Wood</material>
+    <turnGravityOff>true</turnGravityOff>
+  </gazebo>
+  <!-- This joint allows pitching of the bridge-->
+  <joint name="virtual_rev_joint_1" type="revolute" >
+    <parent link="link_virtual1" />
+    <child link="link_virtual2" />
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <axis xyz="0 1 0"/>
+    <limit lower="-0.5" upper="0.5" effort="10000" velocity="2.0"/>
+    <calibration reference_position="0.0"/>	
+  </joint>
+   
+  <link name="link_virtual2">
+<inertial>
+      <mass value="${cue_mass/1000}" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <inertia  ixx="0" ixy="0.0"  ixz="0.01"  iyy="0.01"  iyz="0.0"  izz="0.01" />
+    </inertial>
+    <visual>
+      <origin xyz="0.0 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder length="0.01" radius="0.01"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0.01 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder length="0.01" radius="0.01"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="link_virtual2">
+    <material>Gazebo/Wood</material>
+    <turnGravityOff>true</turnGravityOff>
+  </gazebo>
+  <!-- This joint allows yawing of the bridge-->
+  <joint name="virtual_rev_joint_2" type="revolute" >
+    <parent link="link_virtual2" />
+    <child link="bridge" />
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <axis xyz="1 0 0"/>
+    <limit lower="-0.5" upper="0.5" effort="10000" velocity="2.0"/>
+    <calibration reference_position="0.0"/>	
+  </joint>
+
   <link name="bridge">
     <inertial>
       <mass value="${bridge_mass}" />
@@ -106,7 +173,7 @@
     <collision>
       <origin xyz="-0.06 0 0" rpy="0 0 0" />
       <geometry>
-        <box size="0.10 0.03 0.005"/>
+        <box size="0.10 0.04 0.005"/>
       </geometry>
     </collision>
   </link>
@@ -152,11 +219,23 @@
 <mechanicalReduction>1.0</mechanicalReduction>
 </transmission>
 
-<transmission name="cue_bridge" type="SimpleTransmission">
+<transmission name="cue_v1" type="SimpleTransmission">
 <actuator name="cb"/>
 <joint name="cue_bridge_joint"/>
 <mechanicalReduction>1.0</mechanicalReduction>
 </transmission>
 
+<transmission name="v1_v2" type="SimpleTransmission">
+<actuator name="v12"/>
+<joint name="virtual_rev_joint_1"/>
+<mechanicalReduction>1.0</mechanicalReduction>
+</transmission>
+
+
+<transmission name="v2_bridge" type="SimpleTransmission">
+<actuator name="v2b"/>
+<joint name="virtual_rev_joint_2"/>
+<mechanicalReduction>1.0</mechanicalReduction>
+</transmission>
 
 </robot>

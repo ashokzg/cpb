@@ -298,11 +298,11 @@
 <mechanicalReduction>1.0</mechanicalReduction>
 </transmission>
 
-<!--transmission name="cue_bridge" type="SimpleTransmission">
+<transmission name="cue_bridge" type="SimpleTransmission">
 <actuator name="cb"/>
 <joint name="cue_bridge_joint"/>
 <mechanicalReduction>1.0</mechanicalReduction>
-</transmission-->
+</transmission>
 
 <transmission name="lever_ball_bridge" type="SimpleTransmission">
 <actuator name="lb"/>

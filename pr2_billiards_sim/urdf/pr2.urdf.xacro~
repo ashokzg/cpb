@@ -127,7 +127,7 @@
     <origin xyz=".135 0 .044" rpy="${M_PI/2} ${-32.25*M_PI/180} 0" />
   </xacro:wge100_camera_v0>
 
-
+<!--
   <xacro:property name="lever_length" value="0.5"/>
   <xacro:property name="lever_radius" value="0.0075"/>
   <xacro:property name="lever_mass" value="0.1"/>
@@ -165,7 +165,12 @@
   </link>
   <gazebo reference="lever_stick">
     <material>Gazebo/Wood</material>
+<<<<<<< HEAD
     <turnGravityOff>true</turnGravityOff>
+=======
+    <turnGravityOff>false</turnGravityOff>	
+    <selfCollide>true</selfCollide>
+>>>>>>> ca2440fcd2ee8b481865029ed631a3577d57df79
   </gazebo>
 
 
@@ -206,7 +211,12 @@
   </link>
   <gazebo reference="cue_stick">
     <material>Gazebo/Wood</material>
+<<<<<<< HEAD
     <turnGravityOff>true</turnGravityOff>
+=======
+    <turnGravityOff>false</turnGravityOff>
+    <selfCollide>true</selfCollide>
+>>>>>>> ca2440fcd2ee8b481865029ed631a3577d57df79
   </gazebo>
 
   <xacro:property name="bridge_mass" value="0.1"/>
@@ -231,19 +241,24 @@
     <visual>
       <origin xyz="-0.06 0 0" rpy="0 0 0" />
       <geometry>
-        <box size="0.10 0.04 0.005"/>
+        <box size="0.10 0.04 0.01"/>
       </geometry>
     </visual>
     <collision>
       <origin xyz="-0.06 0 0" rpy="0 0 0" />
       <geometry>
-        <box size="0.10 0.03 0.005"/>
+        <box size="0.10 0.04 0.01"/>
       </geometry>
     </collision>
   </link>
   <gazebo reference="bridge">
     <material>Gazebo/White</material>
     <turnGravityOff>true</turnGravityOff>
+<<<<<<< HEAD
+=======
+    <mu1>100.0</mu1>
+    <mu2>100.0</mu2>		
+>>>>>>> ca2440fcd2ee8b481865029ed631a3577d57df79
     <selfCollide>true</selfCollide>
   </gazebo>
 
@@ -294,6 +309,6 @@
 <joint name="lever_ball_joint"/>
 <mechanicalReduction>1.0</mechanicalReduction>
 </transmission>
-
+-->
 
 </robot>

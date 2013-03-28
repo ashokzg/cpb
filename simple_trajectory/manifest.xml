@@ -13,7 +13,9 @@
   <depend package="rospy"/>
   <depend package="pr2_controllers_msgs"/>
   <depend package="joint_states_listener"/>
-
+  <export>
+     <cpp cflags=" -I${prefix}/srv_gen/cpp/include"/>
+  </export>
 </package>
 
 

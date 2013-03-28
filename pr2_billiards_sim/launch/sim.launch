@@ -1,3 +1,4 @@
+<!--xml-->
 <launch>
 
   <!-- load ik -->
@@ -8,4 +9,5 @@
   <node name="iktt" pkg="ik_trajectory_tutorial" type="ik_trajectory_tutorial" respawn="false" output="screen"/> 
   <node name="ikttl" pkg="ik_trajectory_tutorial" type="left_ik_trajectory_tutorial" respawn="false" output="screen"/> 
   <node name="sg" pkg="simple_gripper" type="simple_gripper" respawn="false" output="screen"/> 
+  <node name="initStick" pkg="bridge_mover" type="init.py" respawn="false" output="screen" />
 </launch>

@@ -5,7 +5,7 @@
   <include file="$(find pr2_arm_navigation_kinematics)/launch/pr2_ik_rarm_node.launch"/>
   <include file="$(find pr2_arm_navigation_kinematics)/launch/pr2_ik_larm_node.launch"/>
   <node name="jsl" pkg="joint_states_listener" type="joint_states_listener.py" respawn="false" output="screen"/>
-  <node name="simple_trajectory" pkg="simple_trajectory" type="simple_trajectory" respawn="false" output="screen"/>
+  <node name="simple_trajectory" pkg="simple_trajectory" type="simple_trajectory" respawn="true" output="screen"/>
   <node name="iktt" pkg="ik_trajectory_tutorial" type="ik_trajectory_tutorial" respawn="false" output="screen"/> 
   <node name="ikttl" pkg="ik_trajectory_tutorial" type="left_ik_trajectory_tutorial" respawn="false" output="screen"/> 
   <node name="sg" pkg="simple_gripper" type="simple_gripper" respawn="false" output="screen"/> 

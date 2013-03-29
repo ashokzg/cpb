@@ -49,7 +49,7 @@ public:
     }
 
     //register a service to input desired Cartesian trajectories
-    service = node.advertiseService("execute_cartesian_ik_trajectory", 
+    service = node.advertiseService("left_execute_cartesian_ik_trajectory", 
         &IKTrajectoryExecutor::execute_cartesian_ik_trajectory, this);
 
     //have to specify the order of the joints we're sending in our 

@@ -11,7 +11,10 @@
   <depend package="rospy"/>
   <depend package="gazebo"/>
   <depend package="tf"/>
-
+  <depend package="simple_trajectory"/>
+  <depend package="simple_gripper"/>
+  <depend package="simple_torso"/>
+  <depend package="ik_trajectory_tutorial"/>            
 </package>
 
 

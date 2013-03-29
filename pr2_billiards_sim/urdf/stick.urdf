@@ -1,0 +1,205 @@
+<?xml version="1.0" ?>
+<robot name="stick" 
+       xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller" 
+       xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface" 
+       xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor" 
+       xmlns:xacro="http://ros.org/wiki/xacro">
+  <link name="lever_stick">
+    <inertial>
+      <mass value="0.1"/>
+      <origin rpy="0 0 0" xyz="0 0 0.15"/>
+      <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.01"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.15"/>
+      <geometry>
+        <cylinder length="0.5" radius="0.0075"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.15"/>
+      <geometry>
+        <cylinder length="0.5" radius="0.0075"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="lever_stick">
+    <material>Gazebo/Wood</material>
+    <turnGravityOff>true</turnGravityOff>
+  </gazebo>
+  <joint name="cue_ball_joint" type="revolute">
+    <parent link="lever_stick"/>
+    <child link="cue_stick"/>
+    <origin rpy="0 1.57 0" xyz="0 0 0.4"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="10000" lower="-0.5" upper="0.5" velocity="1.0"/>
+    <calibration reference_position="0.0"/>
+  </joint>
+  <link name="cue_stick">
+    <inertial>
+      <mass value="0.01"/>
+      <origin rpy="0 0 0" xyz="0 0 0.53"/>
+      <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.001"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.53"/>
+      <geometry>
+        <cylinder length="1.0" radius="0.0065"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.53"/>
+      <geometry>
+        <cylinder length="1.0" radius="0.0065"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="cue_stick">
+    <material>Gazebo/Wood</material>
+    <turnGravityOff>true</turnGravityOff>
+  </gazebo>
+  <joint name="cue_bridge_joint" type="prismatic">
+    <parent link="cue_stick"/>
+    <child link="link_virtual1"/>
+    <origin rpy="0 0 0" xyz="0 0 0.95"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10000" lower="-0.1" upper="0.1" velocity="1.0"/>
+    <calibration reference_position="0.0"/>
+  </joint>
+  <link name="link_virtual1">
+    <inertial>
+      <mass value="1e-05"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0" ixy="0.0" ixz="0.01" iyy="0.01" iyz="0.0" izz="0.01"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0.0 0 0"/>
+      <geometry>
+        <cylinder length="0.01" radius="0.01"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0.01 0 0"/>
+      <geometry>
+        <cylinder length="0.01" radius="0.01"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="link_virtual1">
+    <material>Gazebo/Wood</material>
+    <turnGravityOff>true</turnGravityOff>
+  </gazebo>
+  <joint name="virtual_rev_joint_1" type="revolute">
+    <parent link="link_virtual1"/>
+    <child link="link_virtual2"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="10000" lower="-0.5" upper="0.5" velocity="2.0"/>
+    <calibration reference_position="0.0"/>
+  </joint>
+  <link name="link_virtual2">
+    <inertial>
+      <mass value="1e-05"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0" ixy="0.0" ixz="0.01" iyy="0.01" iyz="0.0" izz="0.01"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0.0 0 0"/>
+      <geometry>
+        <cylinder length="0.01" radius="0.01"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0.01 0 0"/>
+      <geometry>
+        <cylinder length="0.01" radius="0.01"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="link_virtual2">
+    <material>Gazebo/Wood</material>
+    <turnGravityOff>true</turnGravityOff>
+  </gazebo>
+  <joint name="virtual_rev_joint_2" type="revolute">
+    <parent link="link_virtual2"/>
+    <child link="bridge"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit effort="10000" lower="-0.5" upper="0.5" velocity="2.0"/>
+    <calibration reference_position="0.0"/>
+  </joint>
+  <link name="bridge">
+    <inertial>
+      <mass value="0.1"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="-0.06 0 0"/>
+      <geometry>
+        <box size="0.10 0.07 0.005"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="-0.06 0 0"/>
+      <geometry>
+        <box size="0.10 0.07 0.005"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="bridge">
+    <material>Gazebo/White</material>
+    <turnGravityOff>true</turnGravityOff>
+    <selfCollide>true</selfCollide>
+  </gazebo>
+  <joint name="cue_bridge_bottom_joint" type="fixed">
+    <parent link="bridge"/>
+    <child link="bridge_bottom"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+  <link name="bridge_bottom">
+    <inertial>
+      <mass value="0.1"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0.02 0 0"/>
+      <geometry>
+        <box size="0.02 0.03 0.005"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0.02 0 0"/>
+      <geometry>
+        <box size="0.02 0.03 0.005"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="bridge_bottom">
+    <material>Gazebo/Red</material>
+    <turnGravityOff>true</turnGravityOff>
+    <selfCollide>true</selfCollide>
+  </gazebo>
+  <transmission name="lever_cue" type="SimpleTransmission">
+    <actuator name="lc"/>
+    <joint name="cue_ball_joint"/>
+    <mechanicalReduction>1.0</mechanicalReduction>
+  </transmission>
+  <transmission name="cue_v1" type="SimpleTransmission">
+    <actuator name="cb"/>
+    <joint name="cue_bridge_joint"/>
+    <mechanicalReduction>1.0</mechanicalReduction>
+  </transmission>
+  <transmission name="v1_v2" type="SimpleTransmission">
+    <actuator name="v12"/>
+    <joint name="virtual_rev_joint_1"/>
+    <mechanicalReduction>1.0</mechanicalReduction>
+  </transmission>
+  <transmission name="v2_bridge" type="SimpleTransmission">
+    <actuator name="v2b"/>
+    <joint name="virtual_rev_joint_2"/>
+    <mechanicalReduction>1.0</mechanicalReduction>
+  </transmission>
+</robot>
+

@@ -1,0 +1,24 @@
+<package>
+  <description brief="add_stick">
+
+     add_stick
+
+  </description>
+  <author>Nikhil</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/add_stick</url>
+  <depend package="pr2_arm_navigation_tutorials"/>
+  <depend package="actionlib"/>
+  <depend package="tf"/>
+  <depend package="planning_environment"/>
+  <depend package="planning_models"/>
+  <depend package="gazebo"/>
+  <depend package="pr2_controllers_msgs"/>
+  <depend package="arm_navigation_msgs"/>
+  <depend package="kinematics_msgs"/>
+  <depend package="actionlib_msgs"/>
+
+</package>
+
+

@@ -1,7 +1,5 @@
 <launch>
  
-<!--load map -->
-  <node name="map_server" pkg="map_server" type="map_server" args="$(find pr2_billiards_sim)/launch/map.pgm 0.1" respawn="true" />
   
 <!-- machine tags for sim, be sure to set environment variable ROBOT to sim -->
   <include file="$(find pr2_machine)/sim.machine" />
@@ -10,6 +8,8 @@
   <include file="$(find pr2_navigation_perception)/lasers_and_filters.xml" />
   <include file="$(find pr2_navigation_perception)/ground_plane.xml" />
   <include file="$(find pr2_navigation_global)/move_base.xml" />
+<!--load map -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find pr2_billiards_sim)/launch/map.yaml" respawn="true" />
 
 
 

@@ -15,7 +15,9 @@
   <depend package="kinematics_msgs"/>
   <depend package="pr2_controllers_msgs"/>
   <depend package="tf"/>
-
+  <export>
+     <cpp cflags=" -I${prefix}/srv_gen/cpp/include"/>
+  </export>
 </package>
 
 

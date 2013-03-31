@@ -1,0 +1,7 @@
+image: table-1cm.pgm
+resolution: 0.010000
+origin: [-8.334854, -11.828370, 0.000000]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.196
+

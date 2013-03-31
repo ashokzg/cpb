@@ -42,18 +42,19 @@ rospy.init_node('Base_position', anonymous=True)
 tfBroadcast = tf.TransformBroadcaster()
 tfListen = tf.TransformListener()
 
-tfBroadcast.sendTransform((1,2,3),(1,2,3,4),rospy.Time.now(),"bridge","table")
 
-''' we need subscriber code later when we will listen to  cue ball's position
+#we need subscriber code later when we will listen to  cue ball's position
 def callback(data):
+    bridge_position = calculate_bridge_position(ball_x, ball_y, angle)
+    #calculate_base_position(bridge_position)
 
 
 def listener():
     print "someting"
-    rospy.Subscriber("/gazebo/link_states", LinkStates, callback)
+    rospy.Subscriber("stupid", String, callback)
     print "woohoo"
     rospy.spin()
-'''
+
 
 def dist(x1,y1,x2,y2):
     return np.sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1))
@@ -134,15 +135,17 @@ def calculate_bridge_position(px,py,theta):
 #                     rospy.Time.now(),
 #                     "bridge",
 #                     "table")
-    try:
-        tfBroadcast.sendTransform((9,8,7),
-                         (9,8,7,6),
-                         rospy.Time.now(),
-                         "bridge",
-                         "table")
-    except:
-        print "Horrible"
-    #pose = #transformation between table and world
+     
+
+    rate = rospy.Rate(10.0)
+    #while not rospy.is_shutdown():
+    tfBroadcast.sendTransform((9,8,7),
+                     (9,8,7,6),
+                     rospy.Time.now(),
+                     "bridge",
+                     "table")
+        #rate.sleep()
+        #pose = #transformation between table and world
     p = tftw.position
     o = tftw.orientation
     tfBroadcast.sendTransform((p.x, p.y, p.z),
@@ -151,7 +154,9 @@ def calculate_bridge_position(px,py,theta):
                      "table",
                      "world")
 
+   
     try:
+        tfListen.waitForTransfrom('/bridge','/world', rospy.Time.now(),rospy.Duration(4.0))
         (pose.position,pose.orientation) = tfListen.lookupTransform('/bridge', '/world', rospy.Time(0))
         print 'BRIDGE WRT WORLD',pose.position, pose.orientation
     except:
@@ -186,6 +191,6 @@ def calculate_base_position(br_pose):
 
 
 if __name__ == '__main__':
-    bridge_position = calculate_bridge_position(ball_x, ball_y, angle)
+#    bridge_position = calculate_bridge_position(ball_x, ball_y, angle)
 #    calculate_base_position(bridge_position)
-
+     listener()

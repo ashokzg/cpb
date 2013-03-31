@@ -1,0 +1,8 @@
+<launch>
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find billiards_navigation)/maps/map.yaml"/>
+  <include file="$(find billiards_navigation)/launch/amcl_node.xml"/>
+  <node pkg="tf" type="static_transform_publisher" name="table_nav_tf"
+        args="0.03 0.9 0.784 1.578 0 0 map table_nav 10"/>
+  <node pkg="tf" type="static_transform_publisher" name="old_table_nav_tf"
+        args="-0.395 -1.30 0 1.5708 0 0 map old_table_nav 10"/>
+</launch>

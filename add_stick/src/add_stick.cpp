@@ -94,7 +94,7 @@ int main(int argc, char** argv) {
   ROS_INFO("service ready!!");
   //access to tranformation /world to /root_link (table_top)
   ros::ServiceClient client = nh.serviceClient<gazebo_msgs::GetLinkState>("gazebo/get_link_state");
-  gazebo::GetLinkState srv;
+  gazebo_msgs::GetLinkState srv;
 
  // srv.request.model_name = model_name;
   

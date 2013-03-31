@@ -1,0 +1,306 @@
+#!/usr/bin/env python
+# Software License Agreement (BSD License)
+#
+# Copyright (c) 2008, Willow Garage, Inc.
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+#
+#  * Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#  * Redistributions in binary form must reproduce the above
+#    copyright notice, this list of conditions and the following
+#    disclaimer in the documentation and/or other materials provided
+#    with the distribution.
+#  * Neither the name of Willow Garage, Inc. nor the names of its
+#    contributors may be used to endorse or promote products derived
+#    from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
+import roslib; roslib.load_manifest('billiards_navigation')
+import rospy
+import actionlib
+import sys
+import math
+import tf
+import tf.transformations
+
+from actionlib_msgs.msg import GoalStatus
+from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
+from geometry_msgs.msg import PoseStamped
+from visualization_msgs.msg import Marker, MarkerArray
+
+USAGE = 'USAGE: drive_pool_action <pose_file> <fixed_frame>'
+GOAL_DIST_TRANS = 0.75
+GOAL_DIST_ROT = 0.5
+LOOP_MAX_DIST = 2.0
+BASE_FRAME = 'base_link'
+ACTION_NAME = 'pose_base_controller'
+DEBUG = False
+
+class DrivePoolServer:
+    def __init__(self, args):
+        self.parse_args(args)
+        self.markers = None
+        self.goals = self.load_poses()
+        print 'Loaded %d goals from %s'%(len(self.goals), self.pose_fname)
+        self.goals = self.filter_goals(self.goals)
+        print 'After filtering, %d goals'%(len(self.goals))
+        self.tf = tf.TransformListener()
+        self.vispub = rospy.Publisher('visualization_marker_array', MarkerArray)
+        self.posesub = rospy.Subscriber('drive_pool_pose_goal', PoseStamped, self.pose_cb)
+
+        self.client = actionlib.SimpleActionClient(ACTION_NAME, MoveBaseAction)
+        print 'Waiting for %s action...'%(ACTION_NAME)
+        if not DEBUG:
+            self.client.wait_for_server()
+        print 'Found %s action.'%(ACTION_NAME)
+
+        self.server = actionlib.SimpleActionServer('drive_pool', MoveBaseAction, self.execute)
+        
+    # old-fashioned callback, for rviz compatibility
+    def pose_cb(self, pose):
+        g = MoveBaseGoal()
+        g.target_pose = pose
+        self.execute(g)
+
+    def parse_args(self, args):
+        if len(args) != 3:
+            print USAGE
+            sys.exit(1)
+        self.pose_fname = args[1]
+        self.fixed_frame = args[2]
+        
+    def get_robot_pose(self):
+        o = PoseStamped()
+        o.pose.orientation.w = 1.0
+        o.header.frame_id = BASE_FRAME
+        try:
+            self.tf.waitForTransform(self.fixed_frame, BASE_FRAME, rospy.Time(), rospy.Duration(0.5))
+            p = self.tf.transformPose(self.fixed_frame, o)
+            return p 
+        except tf.Exception as e:
+            print 'Failed to determine %s pose in %s frame'%(BASE_FRAME, self.fixed_frame)
+            return None
+        
+    def execute(self, goal):
+        print 'execute: received goal: ' + `goal`
+        start = self.get_robot_pose() 
+        if start is None:
+            print 'Failed to get start location to plan from'
+            self.server.set_aborted()
+            return
+
+        try:
+            self.tf.waitForTransform(self.fixed_frame, goal.target_pose.header.frame_id, goal.target_pose.header.stamp, rospy.Duration(0.5))
+            goal.target_pose = self.tf.transformPose(self.fixed_frame, goal.target_pose)
+        except tf.Exception as e:
+            print 'Failed to transform from %s to %s (%s)'%(goal.target_pose.header.frame_id, self.fixed_frame, e)
+            self.server.set_aborted()
+            return
+
+        plan = self.plan(start, goal.target_pose)
+        if plan is None:
+            print 'Failed to make a plan'
+            self.server.set_aborted()
+            return
+
+        print 'plan: ' + `plan`
+        self.visualize_plan(plan)
+        for g in plan:
+            ctr = 3
+            while ctr > 0:
+                print 'Sending goal: ' + `g`
+                if not DEBUG:
+                    self.client.send_goal(g)
+                print 'Waiting for action to complete...'
+                if not DEBUG:
+                    self.client.wait_for_result()
+                    end_state = self.client.get_state()
+                    print 'end_state: %d'%(end_state)
+                    if end_state == GoalStatus.SUCCEEDED:
+                        break
+                    else:
+                        ctr -= 1
+                        print "resending goal to pose base controller"
+                        rospy.logwarn("resending goal to pose base controller")
+            if ctr == 0:
+                print "pose base controller failed after retries"
+                rospy.logerr("pose base controller failed after retries")
+                self.server.set_aborted()
+                return
+                    
+            print 'Action complete.'
+        self.server.set_succeeded()
+
+    # Load poses from file
+    def load_poses(self):
+        goals = []
+        f = open(self.pose_fname)
+        for l in f:
+            if l.startswith('#'):
+                continue
+            ls = l.strip().split(',')
+            if len(ls) != 7:
+                print 'ERROR: wrong number of elements'
+                sys.exit(1)
+            (tx,ty,tz,qx,qy,qz,qw) = ls
+            g = MoveBaseGoal()
+            g.target_pose.header.frame_id = self.fixed_frame
+            g.target_pose.pose.position.x = float(tx)
+            g.target_pose.pose.position.y = float(ty)
+            g.target_pose.pose.position.z = float(tz)
+            g.target_pose.pose.orientation.x = float(qx)
+            g.target_pose.pose.orientation.y = float(qy)
+            g.target_pose.pose.orientation.z = float(qz)
+            g.target_pose.pose.orientation.w = float(qw)
+            goals.append(g)
+        return goals
+
+    # Compute shortest signed distance between two angles
+    def angle_diff(self, a, b):
+        a = math.atan2(math.sin(a), math.cos(a))
+        b = math.atan2(math.sin(b), math.cos(b))
+        d1 = a-b
+        d2 = 2*math.pi - abs(d1)
+        if d1 > 0:
+            d2 *= -1.0
+        if abs(d1) < abs(d2):
+            return d1
+        else:
+            return d2
+
+    # Filter goals so that they differ by a minimum rotation or translation
+    # distance
+    def filter_goals(self, goals):
+        filtered_goals = []
+        for g in goals:
+            if len(filtered_goals) == 0:
+                filtered_goals.append(g)
+            else:
+                dx = filtered_goals[-1].target_pose.pose.position.x - g.target_pose.pose.position.x
+                dy = filtered_goals[-1].target_pose.pose.position.y - g.target_pose.pose.position.y
+                dt = math.sqrt(dx*dx + dy*dy)
+                # There's probably some awesome tf / bullet thing 
+                # that I should be using here.
+                oldyaw = tf.transformations.euler_from_quaternion((filtered_goals[-1].target_pose.pose.orientation.x, filtered_goals[-1].target_pose.pose.orientation.y, filtered_goals[-1].target_pose.pose.orientation.z, filtered_goals[-1].target_pose.pose.orientation.w))[2]
+                newyaw = tf.transformations.euler_from_quaternion((g.target_pose.pose.orientation.x, g.target_pose.pose.orientation.y, g.target_pose.pose.orientation.z, g.target_pose.pose.orientation.w))[2]
+                dyaw = self.angle_diff(newyaw, oldyaw)
+                if dt > GOAL_DIST_TRANS or abs(dyaw) > GOAL_DIST_ROT:
+                    filtered_goals.append(g)
+        return filtered_goals 
+
+    # Find goal closest to given pose
+    def find_closest_goal(self, pose):
+        min_g = None
+        min_d = None
+        for idx in range(0,len(self.goals)):
+            g = self.goals[idx]
+            dx = pose.pose.position.x - g.target_pose.pose.position.x
+            dy = pose.pose.position.y - g.target_pose.pose.position.y
+            d = math.sqrt(dx*dx + dy*dy)
+            if d > LOOP_MAX_DIST:
+                continue
+            if min_g is None or d < min_d:
+                min_d = d
+                min_g = idx
+        return min_g
+
+    # Visualize plan
+    def visualize_plan(self, plan):
+        if self.markers is not None:
+            for i in range(0,len(self.markers.markers)):
+                self.markers.markers[i].action = Marker.DELETE
+        self.vispub.publish(self.markers)
+
+        self.markers = MarkerArray()
+        for i in range(0,len(plan)):
+            g = plan[i]
+            m = Marker()
+            m.header.frame_id = g.target_pose.header.frame_id
+            m.header.stamp = rospy.Time.now()
+            m.ns = 'drive_pool_markers'
+            m.id = i
+            m.action = Marker.ADD
+            m.type = Marker.ARROW
+            m.pose = g.target_pose.pose
+            m.scale.x = 0.5
+            m.scale.y = 0.5
+            m.scale.z = 0.5
+            m.color.r = 0.0
+            m.color.g = 1.0
+            m.color.b = 0.0
+            m.color.a = 1.0
+            self.markers.markers.append(m)
+        self.vispub.publish(self.markers)
+
+    # Find plan
+    def plan(self, start_pose, end_pose):
+        print 'start_pose ' + `start_pose`
+        print 'end_pose ' + `end_pose`
+        start_goal = self.find_closest_goal(start_pose)
+        if start_goal is None:
+            print 'Failed to find goal within %f meters of start pose'%(LOOP_MAX_DIST)
+            return None
+        end_goal = self.find_closest_goal(end_pose)
+        if end_goal is None:
+            print 'Failed to find goal within %f meters of end pose'%(LOOP_MAX_DIST)
+            return None
+
+        plan = []
+
+        # Only get on the roadmap if start != end
+        if start_goal != end_goal:
+            # Assemble the plan, accounting for wraparound from end to
+            # beginning
+            # Determine the shortest path.
+            d1 = abs(start_goal - end_goal)
+            d2 = min(start_goal, end_goal) + len(self.goals) - max(start_goal, end_goal)
+            if d1 < d2:
+                # No wraparound
+                if start_goal < end_goal:
+                    # Going forward
+                    for i in range(start_goal, end_goal+1, +1):
+                        plan.append(self.goals[i])
+                else:
+                    # Going backward
+                    for i in range(start_goal, end_goal-1, -1):
+                        plan.append(self.goals[i])
+            else:
+                # Wraparound
+                if start_goal < end_goal:
+                    # Going backward
+                    for i in range(start_goal, -1, -1):
+                        plan.append(self.goals[i])
+                    for i in range(len(self.goals)-1, end_goal-1, -1):
+                        plan.append(self.goals[i])
+                else:
+                    # Going forward
+                    for i in range(start_goal, len(self.goals), +1):
+                        plan.append(self.goals[i])
+                    for i in range(0, end_goal+1, +1):
+                        plan.append(self.goals[i])
+
+        end = MoveBaseGoal()
+        end.target_pose = end_pose
+        plan.append(end)
+        return plan
+
+if __name__ == '__main__':
+    rospy.init_node('drive_pool_server')
+    server = DrivePoolServer(rospy.myargv())
+    rospy.spin()

@@ -58,3 +58,13 @@ Service takes the shot described by the parameter simple_trajectory/ShotStart/j0
 
 TAKE: 
 0 => Take the shot   1 => Retreive cue stick to start position
+
+Useful Link:
+------------
+1) Uderstanding the planning scene:
+https://kforge.ros.org/Sushi/trac/wiki/Planning/PlanningScene
+
+2) Understanding the collision map: 
+https://kforge.ros.org/Sushi/trac/wiki/Perception/CollisionMap
+
+

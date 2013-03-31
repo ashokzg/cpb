@@ -1,0 +1,17 @@
+<package>
+  <description brief="base_position">
+
+     base_position
+
+  </description>
+  <author>Harshavardhan</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/base_position</url>
+  <depend package="rospy"/>
+  <depend package="tf"/>
+  <depend package="geometry_msgs"/>
+
+</package>
+
+

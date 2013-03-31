@@ -13,6 +13,8 @@
 #include <tf/tf.h>
 #include <planning_environment/util/construct_object.h>
 #include <gazebo/GetModelState.h>
+#include <gazebo/GetLinkState.h>
+#include <gazebo_msgs/GetLinkState.h>
 //#include <urdf/link.h>
 
 shapes::Shape* constructShape(const urdf::Geometry *geom)
@@ -54,8 +56,8 @@ shapes::Shape* constructShape(const urdf::Geometry *geom)
 int main(int argc, char** argv) {
 
   ros::init(argc, argv, "addURDF");
-  //const std::string frame_id = "/base_footprint";
-  const std::string frame_id = "/map";
+  const std::string frame_id = "/base_footprint";
+  //const std::string frame_id = "/map";
 
   ros::NodeHandle nh;
 
@@ -86,23 +88,15 @@ int main(int argc, char** argv) {
     ROS_INFO("\t origin: %f,%f,%f", (*joints_it).second->parent_to_joint_origin_transform.position.x, (*joints_it).second->parent_to_joint_origin_transform.position.y, (*joints_it).second->parent_to_joint_origin_transform.position.z);
   }
 
-  ros::service::waitForService("/gazebo/get_model_state");
+  //ros::service::waitForService("/gazebo/get_model_state");
+  ros::service::waitForService("gazebo/get_link_state");
   //ros::service::waitForService("/cob3_environment_server/get_state_validity");  //just to make sure that the environment_server is there!
-
+  ROS_INFO("service ready!!");
   //access to tranformation /world to /root_link (table_top)
-  ros::ServiceClient client = nh.serviceClient<gazebo::GetModelState>("/gazebo/get_model_state");
-  gazebo::GetModelState srv;
+  ros::ServiceClient client = nh.serviceClient<gazebo_msgs::GetLinkState>("gazebo/get_link_state");
+  gazebo::GetLinkState srv;
 
-  srv.request.model_name = model_name;
-  if (client.call(srv))
-  {
-        ROS_INFO("URDFPose (x,y,z): (%f,%f,%f)", srv.response.pose.position.x, srv.response.pose.position.y, srv.response.pose.position.z);
-  }
-  else
-  {
-        ROS_ERROR("Failed to call service get_model_state");
-        ros::shutdown();
-  }
+ // srv.request.model_name = model_name;
   
   arm_navigation_msgs::CollisionObject collision_object;
   collision_object.id = model_name + "_object";
@@ -115,19 +109,20 @@ int main(int argc, char** argv) {
   
   ROS_INFO("1 URDF_links %d\n",URDF_links.size());	
   joints_it=URDF_joints.begin();
+while(ros::ok())
+{
   for(unsigned int i=0; i<URDF_links.size(); i++)
   {
-  ROS_INFO("2\n");	
           urdf::Link current_link = *URDF_links[i];
           ROS_INFO("Current Link: %s", current_link.name.c_str());
-
+/*
           if(current_link.name == "lever_stick")
           {
                   ROS_INFO("Dealing with FU lever stick dummy_link...");
                   continue;
           }
-
-          boost::shared_ptr< urdf::Joint > current_parent_joint = current_link.parent_joint;
+*/
+  //        boost::shared_ptr< urdf::Joint > current_parent_joint = current_link.parent_joint;
           //ROS_INFO("Current Parent Joint: %s", current_parent_joint->name.c_str());
 
           
@@ -136,50 +131,58 @@ int main(int argc, char** argv) {
           current_shape = constructShape(current_link.collision->geometry.get());
           ROS_INFO("shape.type: %d", current_shape->type);
           
-          //ROS_INFO("Position (x,y,z): (%f,%f,%f)", current_link.collision->origin.position.x, current_link.collision->origin.position.y, current_link.collision->origin.position.z);
-
-          tf::Pose pose;
-          tf::Transform world2dummy;
-          tf::Transform dummy2link;
-          world2dummy = tf::Transform(tf::Quaternion(srv.response.pose.orientation.x, srv.response.pose.orientation.y, srv.response.pose.orientation.z, srv.response.pose.orientation.w), tf::Vector3(srv.response.pose.position.x, srv.response.pose.position.y, srv.response.pose.position.z));
-          dummy2link = tf::Transform(tf::Quaternion(current_parent_joint->parent_to_joint_origin_transform.rotation.x, 
-                                                                                                current_parent_joint->parent_to_joint_origin_transform.rotation.y, 
-                                                                                                current_parent_joint->parent_to_joint_origin_transform.rotation.z, 
-                                                                                                current_parent_joint->parent_to_joint_origin_transform.rotation.w), 
-                                                                 tf::Vector3(current_parent_joint->parent_to_joint_origin_transform.position.x, 
-                                                                                         current_parent_joint->parent_to_joint_origin_transform.position.y, 
-                                                                                         current_parent_joint->parent_to_joint_origin_transform.position.z));
-          tf::Pose pose2;
-          pose2.mult(world2dummy, dummy2link);
-
+//**************************************************************
+// Making a service call for getting link state of current link with respect to frame_id
+          tf::Pose pose1;
+  srv.request.link_name = current_link.name;//;.c_str();
+  srv.request.reference_frame = frame_id;
+//**********************************************************
+  if (client.call(srv))
+  {
+//        ROS_INFO("URDFPose (x,y,z): (%f,%f,%f)", srv.response.pose.position.x, srv.response.pose.position.y, srv.response.pose.position.z);
+        collision_object.poses[i] = srv.response.link_state.pose;//msg_pose_stamped.pose;
+/*	pose1.position.x = srv.response.link_state.pose.position.x;
+*/	
+  }
+  else
+  {
+        ROS_ERROR("Failed to call service get_link_state");
+   //     ros::shutdown();
+  }
+          //tf::Transform world2dummy;
+          //tf::Transform dummy2link;
+          
+	  //tf::Pose pose2;
+         // pose2.mult(world2dummy, dummy2link);
+/*
           tf::Stamped<tf::Pose> stamped_pose_in;
           stamped_pose_in.stamp_ = ros::Time::now();
           stamped_pose_in.frame_id_ = frame_id;
-          stamped_pose_in.setData(pose2);
-          
-
+          stamped_pose_in.setData(pose1);
+  */        
+	ROS_INFO("11");
 	  arm_navigation_msgs::Shape msg_shape;	
 //          geometric_shapes::shapes msg_shape;
+	ROS_INFO("22");
           planning_environment::constructObjectMsg(current_shape, msg_shape);
           
-          geometry_msgs::PoseStamped msg_pose_stamped;
+	ROS_INFO("33");
+       //   geometry_msgs::PoseStamped msg_pose_stamped;
           //tf::poseStampedTFToMsg (transformed_pose, msg_pose_stamped);
-          tf::poseStampedTFToMsg (stamped_pose_in, msg_pose_stamped);
+     //     tf::poseStampedTFToMsg (stamped_pose_in, msg_pose_stamped);
           
           collision_object.shapes[i] = msg_shape;
-          collision_object.poses[i] = msg_pose_stamped.pose;
         
-          object_in_map_pub_.publish(collision_object);
+	ROS_INFO("44");
+          //object_in_map_pub_.publish(collision_object);
         
           ROS_INFO("Should have published");
   }
 	
-  ROS_INFO("3\n");
-ros::Rate loop_rate(10);
-while(ros::ok())
-{
+  //ROS_INFO("3\n");
+	  ros::Rate loop_rate(20);
           object_in_map_pub_.publish(collision_object);
-	  ros::spinOnce();
+//	  ros::spinOnce();
 	  loop_rate.sleep();
 }	
   //ros::spin();		

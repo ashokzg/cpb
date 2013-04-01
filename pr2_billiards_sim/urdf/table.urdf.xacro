@@ -37,8 +37,8 @@
   </link>
   <gazebo reference="pool_table">
     <material>Gazebo/Green</material>
-    <mu1>100.0</mu1>
-    <mu2>100.0</mu2>
+    <mu1>10.0</mu1>
+    <mu2>10.0</mu2>
   </gazebo>
 
    <!-- with origin at final approach -->

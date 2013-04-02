@@ -16,7 +16,7 @@ pub = rospy.Publisher('move_base_simple/goal', PoseStamped)
 
 #CONSTANTS
 dist_ball_to_bridge = 0.15
-table_top_height = 0.805 
+table_top_height = 0.115 #HACK 
 table_length = 2.4784
 table_width = 1.3592
 bridge_bottom_height = 0.06
@@ -29,6 +29,7 @@ tfbb.orientation.x=0.4997179635436379
 tfbb.orientation.y=-0.4999773727645122
 tfbb.orientation.z=-0.5000920418849375
 tfbb.orientation.w=0.5002124881274455
+print 'ROLL PITCH YAW',tf.transformations.euler_from_quaternion((tfbb.orientation.x,tfbb.orientation.y,tfbb.orientation.z,tfbb.orientation.w),'sxyz')
 #(tfbb.orientation.x,tfbb.orientation.y,tfbb.orientation.z,tfbb.orientation.w) = tf.transformations.quaternion_from_euler(0,0,0,'ryxz')
 
 #transform of table in world frame
@@ -36,13 +37,13 @@ tftw = Pose()
 tftw.position.x=-2.0
 tftw.position.y=-4.0
 tftw.position.z=0.75
-(tftw.orientation.x,tftw.orientation.y,tftw.orientation.z,tftw.orientation.w) = tf.transformations.quaternion_from_euler(0,0,0,'ryxz')
+(tftw.orientation.x,tftw.orientation.y,tftw.orientation.z,tftw.orientation.w) = tf.transformations.quaternion_from_euler(0,0,0,'syxz')
 
 
 #defining the hard coded position of the ball and direction of approach. We will get this from a service later
 ball_x = 1.5
 ball_y = 0.2
-angle =  np.pi/4
+angle = np.pi/4
 
 
 
@@ -68,63 +69,13 @@ def dist(x1,y1,x2,y2):
     return np.sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1))
 
 def calculate_bridge_position(px,py,theta):
-
-
-    '''
-    #calculating the x and y for bridge base position
-    m = np.tan(theta)
-    print 'm',m
-    #with segment x=0
-    dx=0
-    dy=py - m
-    side1= dist(px,py,dx,dy)
-    c=dy
-
-    #with segment x = (table_length)
-    dx = table_length
-    dy = m*table_length - c
-    side2 = dist(px,py,dx,dy)
-
-    #with segment y=0
-    dy=0
-    dx=-c/m
-    side3 = dist(px,py,dx,dy)
-
-    #with segment y=table_width
-    dy=table_width
-    dx=(dy-c)/m 
-    side4 = dist(px,py,dx,dy)
- 
-    side=np.argmin([side1,side2,side3,side4])
-    if side==0:
-        dx=0
-        dy=py - m
-        distance = dist(px,py,dx,dy)
-        
-
-    if side==1:
-        dx = table_length
-        dy = m*table_length - c
-        distance = dist(px,py,dx,dy)
-
-    if side==2:
-        dy=0
-        dx=-c/m
-        distance = dist(px,py,dx,dy)
-
-    if side==3:
-        dy=table_width
-        dx=(dy-c)/m 
-        distance = dist(px,py,dx,dy)
-
-    print 'intersection point',dx,dy
-    '''
-    ux = np.sin(theta)
-    uy = np.cos(theta)
+    
+    ux = np.cos(theta)
+    uy = np.sin(theta)
     #ux = (dx-px)/distance
     #uy = (dy-py)/distance
-    bx = px + (dist_ball_to_bridge * ux)
-    by = py + (dist_ball_to_bridge * uy)
+    bx = px - (dist_ball_to_bridge * ux)
+    by = py - (dist_ball_to_bridge * uy)
 
     #print 'bridge position',bx,by
 
@@ -132,30 +83,35 @@ def calculate_bridge_position(px,py,theta):
     pose.position.x = bx
     pose.position.y = by
     pose.position.z = table_top_height + bridge_bottom_height
-    (x,y,z,w) = tf.transformations.quaternion_about_axis(theta,(0,0,1))  #the bridge will be perpendicular to the shot angle
+    (x,y,z,w) = tf.transformations.quaternion_about_axis(theta,(0,0,1)) 
     pose.orientation.x=x
     pose.orientation.y=y
     pose.orientation.z=z
     pose.orientation.w=w
     #print 'bridge posE',pose
-#    tfBroadcast.sendTransform((pose.position.x, pose.position.y, pose.position.z),
-#                     (pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w),
-#                     rospy.Time.now(),
-#                     "bridge",
-#                     "table")
+    tfBroadcast.sendTransform((0,0,0),
+                     (pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w),
+                     rospy.Time.now(),
+                     "v_point",
+                     "bridge")
      
 
-    rate = rospy.Rate(10.0)
+    #rate = rospy.Rate(10.0)
+    p = pose.position
+    o = pose.orientation
     #while not rospy.is_shutdown():
-    tfBroadcast.sendTransform((9,8,7),
-                     (9,8,7,6),
+    print "BRIDGE WRT TABLE",p,o
+    tfBroadcast.sendTransform((p.x, p.y, p.z),
+        #             (o.x, o.y, o.z, o.w),
+		      (0,0,0,1),
                      rospy.Time.now(),
                      "table",
-                     "bridge")
+                     "v_point")
         #rate.sleep()
         #pose = #transformation between table and world
     p = tftw.position
     o = tftw.orientation
+    print "TABLE WRT World:",p,o
     tfBroadcast.sendTransform((p.x, p.y, p.z),
                      (o.x, o.y, o.z, o.w),
                      rospy.Time.now(),
@@ -168,6 +124,7 @@ def calculate_bridge_position(px,py,theta):
     try:
         #tfListen.waitForTransfrom('/bridge','/world', rospy.Time.now(),rospy.Duration(4.0))
         (trans, rot) = tfListen.lookupTransform('bridge', 'world', rospy.Time(0))
+        print "HHHHHHHHHHHHHHHHHHHHHHH - BRIDGE IN THE WORLD:",trans,rot
         br_pose.position.x = trans[0]
         br_pose.position.y = trans[1]
         br_pose.position.z = trans[2]
@@ -190,6 +147,7 @@ def calculate_bridge_position(px,py,theta):
     #we need to calculate the base position from the transform between bridge and pr2 base
     #tf_bridge_pr2base = Pose()
     if gotit==1:
+        '''
         ps = br_pose.position
         os = br_pose.orientation
         tfBroadcast.sendTransform((ps.x, ps.y, ps.z),
@@ -197,15 +155,16 @@ def calculate_bridge_position(px,py,theta):
                          rospy.Time.now(),
                          "world1",
                          "bridge1")
+        '''
         pa = tfbb.position
         oa = tfbb.orientation
         tfBroadcast.sendTransform((pa.x, pa.y, pa.z),
                          (oa.x, oa.y, oa.z, oa.w),
                          rospy.Time.now(),
-                         "bridge1",
-                         "pr2_base")
+                         "pr2_base",
+                         "bridge")
         try:
-            (trans,rot) = tfListen.lookupTransform('pr2_base', 'world1', rospy.Time(0))
+            (trans,rot) = tfListen.lookupTransform('pr2_base', 'world', rospy.Time(0))
             #print 'ROBOT BASE IN THEEEEEEEEE WORLD',trans, rot
             new_pose = Pose()
             new_pose.position.x = trans[0]

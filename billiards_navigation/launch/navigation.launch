@@ -1,0 +1,8 @@
+<!--xml-->
+<launch>
+
+<include file="$(find billiards_navigation)/launch/table_localization.launch"/>
+<include file="$(find billiards_navigation)/launch/table_navigation.launch"/>
+
+</launch>
+

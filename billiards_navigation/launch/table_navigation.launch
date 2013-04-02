@@ -1,4 +1,5 @@
 <launch>
+  <!--Need to make it pr2 machine for real robot-->
   <include file="$(find pr2_machine)/sim.machine" />
   <node type="pose_base_controller" pkg="pose_base_controller" name="pose_base_controller" output="screen" machine="c2">
     <!--remap from="base_controller/command" to="park_cmd_vel" /-->
@@ -8,8 +9,8 @@
     <param name="k_rot" value="5.0" />
     <param name="max_vel_lin" value="0.1" />
     <param name="max_vel_th" value="0.5" />
-    <param name="tolerance_trans" value="0.05" />
-    <param name="tolerance_rot" value="0.05" />
+    <param name="tolerance_trans" value="0.02" />
+    <param name="tolerance_rot" value="0.01" />
   </node>
   <!--Setting /map as fixed frame for navigation! -->
   <node pkg="billiards_navigation" type="drive_pool_action" name="drive_pool_action" args="$(find billiards_navigation)/new_pose.log map" output="screen"/>

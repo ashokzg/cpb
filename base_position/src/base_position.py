@@ -2,6 +2,8 @@
 import rospy
 import roslib; roslib.load_manifest('base_position')
 from geometry_msgs.msg import Pose
+from geometry_msgs.msg import PoseStamped
+
 import numpy as np
 
 #from gazebo_msgs.msg import LinkStates
@@ -9,7 +11,7 @@ from std_msgs.msg import String
 import tf
 #import subprocess
 
-pub = rospy.Publisher('desired_pose', Pose)
+pub = rospy.Publisher('move_base_simple/goal', PoseStamped)
 #rospy.init_node('base_pose')
 
 #CONSTANTS
@@ -20,14 +22,14 @@ table_width = 1.3592
 bridge_bottom_height = 0.06
 #transform of base in bridge frame
 tfbb = Pose()
-tfbb.position.x=0
-tfbb.position.y=0
-tfbb.position.z=0
-#tfbb.orientation.x=0
-#tfbb.orientation.y=0
-#tfbb.orientation.z=0
-#tfbb.orientation.w=0
-(tfbb.orientation.x,tfbb.orientation.y,tfbb.orientation.z,tfbb.orientation.w) = tf.transformations.quaternion_from_euler(0,0,0,'ryxz')
+tfbb.position.x=0.7895563460561493
+tfbb.position.y=0.3611339947807817
+tfbb.position.z=-0.660658868487761
+tfbb.orientation.x=0.4997179635436379
+tfbb.orientation.y=-0.4999773727645122
+tfbb.orientation.z=-0.5000920418849375
+tfbb.orientation.w=0.5002124881274455
+#(tfbb.orientation.x,tfbb.orientation.y,tfbb.orientation.z,tfbb.orientation.w) = tf.transformations.quaternion_from_euler(0,0,0,'ryxz')
 
 #transform of table in world frame
 tftw = Pose()
@@ -38,8 +40,8 @@ tftw.position.z=0.75
 
 
 #defining the hard coded position of the ball and direction of approach. We will get this from a service later
-ball_x = 1.000
-ball_y = 1.000
+ball_x = 1.5
+ball_y = 0.2
 angle =  np.pi/4
 
 
@@ -148,8 +150,8 @@ def calculate_bridge_position(px,py,theta):
     tfBroadcast.sendTransform((9,8,7),
                      (9,8,7,6),
                      rospy.Time.now(),
-                     "bridge",
-                     "table")
+                     "table",
+                     "bridge")
         #rate.sleep()
         #pose = #transformation between table and world
     p = tftw.position
@@ -157,8 +159,8 @@ def calculate_bridge_position(px,py,theta):
     tfBroadcast.sendTransform((p.x, p.y, p.z),
                      (o.x, o.y, o.z, o.w),
                      rospy.Time.now(),
-                     "table",
-                     "world")
+                     "world",
+                     "table")
 
     gotit=0
     br_pose = Pose()
@@ -180,7 +182,7 @@ def calculate_bridge_position(px,py,theta):
     except:
         print "Terrible 1"
     #return pose
-    print 'iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiBRIDGE WRT WORLD',br_pose.position.x, br_pose.orientation.w
+    #print 'iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiBRIDGE WRT WORLD',br_pose.position.x, br_pose.orientation.w
     
 
     #def calculate_base_position(br_pose):
@@ -193,15 +195,15 @@ def calculate_bridge_position(px,py,theta):
         tfBroadcast.sendTransform((ps.x, ps.y, ps.z),
                          (os.x, os.y, os.z, os.w),
                          rospy.Time.now(),
-                         "bridge1",
-                         "world1")
+                         "world1",
+                         "bridge1")
         pa = tfbb.position
         oa = tfbb.orientation
         tfBroadcast.sendTransform((pa.x, pa.y, pa.z),
                          (oa.x, oa.y, oa.z, oa.w),
                          rospy.Time.now(),
-                         "pr2_base",
-                         "bridge1")
+                         "bridge1",
+                         "pr2_base")
         try:
             (trans,rot) = tfListen.lookupTransform('pr2_base', 'world1', rospy.Time(0))
             #print 'ROBOT BASE IN THEEEEEEEEE WORLD',trans, rot
@@ -223,8 +225,12 @@ def talker(base_pose):
     #while not rospy.is_shutdown():
     #str = "hello world %s" % rospy.get_time()
     #    rospy.loginfo(str)
-    print "HURRRRRRRRAY",base_pose
-    pub.publish(base_pose)
+    stamped = PoseStamped()
+    stamped.pose=base_pose
+    stamped.header.frame_id = '/map'
+    stamped.header.stamp = rospy.Time.now()
+    print "HURRRRRRRRAY",stamped
+    pub.publish(stamped)
     #    rospy.sleep(1.0)
 
 if __name__ == '__main__':

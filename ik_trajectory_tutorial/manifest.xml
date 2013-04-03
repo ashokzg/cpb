@@ -18,6 +18,7 @@
   <depend package="tf"/>
   <depend package="gazebo_msgs"/>  
   <depend package="gazebo"/>  
+  <depend package="simple_trajectory"/>
   <export>
      <cpp cflags=" -I${prefix}/srv_gen/cpp/include"/>
   </export>

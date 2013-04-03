@@ -19,4 +19,9 @@ TF between bridge and gripper
 Use a static TF to publish to dummy frame. IK left gripper to dummy frame!
 
 For shot:
-rosservice call move_one_joint -- 0 6 -0.5 1
+rosservice call move_one_joint -- 0 6 -0.5 100
+
+For lowering left gripper:
+rosservice call /left_execute_cartesian_ik_trajectory -- "{header: { frame_id: /base_link}, poses: [{position: [0.349, 0.660, 0.995], orientation:[0.000, 0.709, -0.000, 0.705]}]}"
+
+

@@ -56,7 +56,7 @@ tftw.position.z=0.75
 
 
 #defining the hard coded position of the ball and direction of approach. We will get this from a service later
-ball_x = 1.5
+ball_x = 1.04
 ball_y = 0.2
 angle = np.pi/2
 

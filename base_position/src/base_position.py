@@ -178,6 +178,26 @@ def calculate_bridge_position(px,py,theta):
 
     gotit=0
     br_pose = Pose()
+    # desired pose of left wrist wrt bridge
+   # (0.2528217882321748, -0.00030341757741170206, 0.010771746594746834) (-0.7061352475814231, 0.006792870470045197, 0.004182730244311471, 0.7080320429200948)
+    ttfbb = Pose()
+    #(ttfbb.orientation.x,ttfbb.orientation.y,ttfbb.orientation.z,ttfbb.orientation.w) = tf.transformations.quaternion_from_euler(np.pi/2,0,0)	
+    ttfbb.position.x= 0.349#, 0.660, 0.995#-0.2528217882321748
+    ttfbb.position.y= 0.660
+    ttfbb.position.z= 0.995 #0.010771746594746834
+    ttfbb.orientation.x=-0.000#0.707167875814231
+    ttfbb.orientation.y=0.707#0.006792870470045197
+    ttfbb.orientation.z= -0.000#-0.7071067811865475#0.0#0.004182730244311471
+    ttfbb.orientation.w=0.707#0.7080320429200948
+    p = ttfbb.position
+    o = ttfbb.orientation
+    print "wrist desired wrt base desired:",(p,o)
+    tfBroadcast.sendTransform((p.x, p.y, p.z),
+                     (o.x, o.y, o.z, o.w),
+                     rospy.Time.now(),
+                     "wrist_des",
+                     "pr2_base")
+		
     #while not gotit   
     try:
         #tfListen.waitForTransfrom('/bridge','/world', rospy.Time.now(),rospy.Duration(4.0))

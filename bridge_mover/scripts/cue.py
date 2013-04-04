@@ -50,8 +50,8 @@ def callback(data):
                      "foot_print",
                      "gplane")
     try:
-        (trans,rot) = br2pr2.lookupTransform('/bridge', '/foot_print', rospy.Time(0))
-        print trans, rot
+        (trans,rot) = br2pr2.lookupTransform('/foot_print', '/bridge', rospy.Time(0))
+        print "data",trans, rot
     except:
         print "Terrible"
     #rospy.loginfo(rospy.get_name() + ": I heard %s" % data.data)

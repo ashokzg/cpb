@@ -1,0 +1,8 @@
+#arm => 0: right, 1: left
+uint32 arm
+#adjust => 0: adjust to pose 1: reset pose to std
+uint32 adjust
+#global pose that the wrist should be in
+geometry_msgs/Pose globalpose
+---
+uint32 success

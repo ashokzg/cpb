@@ -1,0 +1,24 @@
+<package>
+  <description brief="billiards_navigation">
+
+     billiards_navigation
+
+  </description>
+  <author>Brian Gerkey</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/billiards_navigation</url>
+  <depend package="tf"/>
+  <depend package="amcl"/>
+  <depend package="map_server"/>
+  <depend package="actionlib"/>
+  <depend package="move_base_msgs"/>
+  <depend package="visualization_msgs"/>
+  <depend package="pose_base_controller"/>
+
+  <!-- The test code depends on stage -->
+  <!--depend package="stage"/-->
+
+</package>
+
+

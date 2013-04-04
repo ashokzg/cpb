@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_navigation/launch
+END
+table_navigation.launch
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_navigation/launch/table_navigation.launch
+END
+amcl_node.xml
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_navigation/launch/amcl_node.xml
+END
+table_localization.launch
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_navigation/launch/table_localization.launch
+END

@@ -9,6 +9,7 @@
 #include <kinematics_msgs/GetPositionFK.h>
 #include <ik_trajectory_tutorial/ExecuteCartesianIKTrajectory.h>
 #include <vector>
+#include <simple_trajectory/MoveMultipleJoints.h>
 
 #define MAX_JOINT_VEL 0.5  //in radians/sec
 
@@ -225,26 +226,37 @@ public:
     //get the current joint angles (to find ik solutions close to)
     double last_angles[7];    
     get_current_joint_angles(last_angles);
-
+    double *trajectory_point = new double[7];
     //find IK solutions for each point along the trajectory 
     //and stick them into joint_trajectory
     for(i=0; i<trajectory_length; i++){
       
       stamped_pose.pose = req.poses[i];
-      double *trajectory_point = new double[7];
       success = run_ik(stamped_pose, last_angles, trajectory_point, "l_wrist_roll_link");
       joint_trajectory.push_back(trajectory_point);
-
       if(!success){
         ROS_ERROR("IK solution not found for trajectory point number %d!\n", i);
         return 0;
       }
-      for(j=0; j<7; j++) last_angles[j] = trajectory_point[j];
+      for(j=0; j<7; j++){ 
+		last_angles[j] = trajectory_point[j];
+		if(j == 6)
+			ROS_INFO("Trajectory point %f \n", trajectory_point[j]);
+	}
     }        
 
     //run the resulting joint trajectory
     ROS_INFO("executing joint trajectory");
-    success = execute_joint_trajectory(joint_trajectory);
+    ros::ServiceClient client = node.serviceClient<simple_trajectory::MoveMultipleJoints>("move_multiple_joints");
+    simple_trajectory::MoveMultipleJoints srv;
+    srv.request.arm = 1;
+    for(int i= 0; i < 7; i++)
+	srv.request.jointAngles.push_back(trajectory_point[i]);
+    if(client.call(srv))
+	ROS_INFO("It worked");
+    else
+	ROS_INFO("It fucked");
+    //success = execute_joint_trajectory(joint_trajectory);
     res.success = success;
     
     return success;

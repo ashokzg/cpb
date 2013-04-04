@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_navigation/scripts
+END
+send_goal.py
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_navigation/scripts/send_goal.py
+END
+play_base_log.py
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_navigation/scripts/play_base_log.py
+END
+log_base_pose.py
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_navigation/scripts/log_base_pose.py
+END

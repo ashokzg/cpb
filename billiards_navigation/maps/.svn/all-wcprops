@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_navigation/maps
+END
+table-1cm.yaml
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_navigation/maps/table-1cm.yaml
+END
+table.yaml
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_navigation/maps/table.yaml
+END
+table-only-legs-1cm.yaml
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_navigation/maps/table-only-legs-1cm.yaml
+END
+map.yaml
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_navigation/maps/map.yaml
+END
+map.pgm
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_navigation/maps/map.pgm
+END
+table-only-legs.yaml
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_navigation/maps/table-only-legs.yaml
+END

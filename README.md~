@@ -6,4 +6,7 @@ Repo guidelines:
 
 Steps to setup simulation:  
 -------------------------
-roslaunch 
+1. roslaunch pr2_billiards_sim billiards_world.launch
+2. Wait for simulation to get ready. 
+3. roslaunch pr2_billiards_sim sim.launch 
+

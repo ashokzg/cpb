@@ -21,6 +21,7 @@ def callback(data):
     bridge = data.name.index('stick::bridge')
     fp = data.name.index('pr2::base_footprint')
     lever = data.name.index('stick::lever_stick')
+    wrist = data.name.index('pr2::l_wrist_roll_link')
     print "Bridge", data.pose[bridge]
     print "Foot print", data.pose[fp]
     
@@ -34,7 +35,8 @@ def callback(data):
     print "Right x, y, z: ", rx, ry, rz
     print "Left x, y, z: ", lx, ly, lz    
     print "Bride wrt gplane", data.pose[bridge]
-    print "Lever wrt gplane", data.pose[lever]    
+    print "Lever wrt gplane", data.pose[lever]
+    print "wrist wrt gplane", data.pose[wrist]    
     p = data.pose[bridge].position
     o = data.pose[bridge].orientation
     br.sendTransform([p.x, p.y, p.z],
@@ -49,9 +51,17 @@ def callback(data):
                      rospy.Time.now(),
                      "foot_print",
                      "gplane")
+   
+    p = data.pose[wrist].position
+    o = data.pose[wrist].orientation
+    br.sendTransform([p.x, p.y, p.z],
+                     [o.x, o.y, o.z, o.w],
+                     rospy.Time.now(),
+                     "wrist",
+                     "gplane")
     try:
-        (trans,rot) = br2pr2.lookupTransform('/bridge', '/foot_print', rospy.Time(0))
-        print trans, rot
+        (trans,rot) = br2pr2.lookupTransform('/wrist', '/bridge', rospy.Time(0))
+        print "wrist wrt bridge",trans, rot
     except:
         print "Terrible"
     #rospy.loginfo(rospy.get_name() + ": I heard %s" % data.data)

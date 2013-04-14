@@ -28,7 +28,6 @@ class ball_locator:
     try:
       if self.mute == False:	
       	self.image = self.bridge.imgmsg_to_cv(data, "bgr8")
-      	
     except CvBridgeError, e:
       print e
 
@@ -42,14 +41,18 @@ class ball_locator:
       image = cv.CloneMat(self.image) 
       cv.Smooth(image,image, cv.CV_GAUSSIAN, 15, 15)
       #convert to HSV space
-      image = cv.fromarray(cv2.cvtColor(np.asarray(image),cv2.cv.CV_BGR2HSV))      
+      #image = cv.fromarray(cv2.cvtColor(np.asarray(image),cv2.cv.CV_BGR2HSV))      
       #Filter for yellow balls
-      #chan = cv.CloneMat(image)
-      #chan = cv2.split(np.asarray(image))
-      #cv.Threshold(image,image,228,255,cv.CV_THRESH_BINARY) 		
+      chan = cv.CloneMat(image)
+      chan = cv2.split(np.asarray(image))
+      flag,image = cv2.threshold(np.asarray(image),160,210,cv2.THRESH_BINARY) 
+      image = cv.fromarray(image)			
+      #print 'tyoe',type(cv.fromarray(chan[1]))
+      t_img =  cv.CreateImage(cv.GetSize(image), 8, 1) 
+      cv.InRangeS(image,(210,210,210),(255,255,255),t_img) 		
       #cv.Dilate(image,image,None,2)
       #cv.Erode(image,image,None,2)
-      cv.ShowImage("Image window", image)
+      cv.ShowImage("Image window",image)# t_img)
       cv.WaitKey(3)
       rospy.sleep(0.05)# sleeping for 50 ms	
 

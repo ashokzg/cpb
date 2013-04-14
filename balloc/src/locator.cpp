@@ -24,6 +24,8 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/core/core.hpp>
 
+using namespace cv;
+using namespace std;
 namespace enc = sensor_msgs::image_encodings;
 
 static const char WINDOW[] = "Image window";
@@ -34,7 +36,7 @@ class ImageConverter
   image_transport::ImageTransport it_;
   image_transport::Subscriber image_sub_;
   image_transport::Publisher image_pub_;
-  cv::Mat imageA, imageB;
+  Mat imageA, imageB;
   bool flag;
   static const double blob_area_absolute_min_ = 60;
   static const double blob_area_absolute_max_ = 5000;
@@ -48,7 +50,7 @@ public:
     image_pub_ = it_.advertise("out", 1);
     image_sub_ = it_.subscribe("/usb_cam/image_raw", 1, &ImageConverter::imageCb, this);
 
-    cv::namedWindow(WINDOW);
+    namedWindow(WINDOW);
     while(flag == false)
     {
     	loop_rate.sleep();
@@ -60,7 +62,7 @@ public:
 
   ~ImageConverter()
   {
-    cv::destroyWindow(WINDOW);
+    destroyWindow(WINDOW);
   }
 
   void imageCb(const sensor_msgs::ImageConstPtr& msg)
@@ -83,7 +85,7 @@ public:
   
   void locator()
   {
-    	cv::namedWindow("Tracking");
+    	namedWindow("Tracking");
 	  int hMin, hMax, sMin, sMax, vMin, vMax;
 	      hMin = 0;
 	      hMax = 124;
@@ -91,53 +93,69 @@ public:
 	      sMax = 255;
 	      vMin = 139;
 	      vMax = 255;
-	      cv::Mat smoothed, hsvImg, t_img;
-//	      cv::createTrackbar("Hue Min", "Tracking", &hMin, 255);
-//	      cv::createTrackbar("Hue Max", "Tracking", &hMax, 255);
-//	      cv::createTrackbar("Sat Min", "Tracking", &sMin, 255);
-//	      cv::createTrackbar("Sat Max", "Tracking", &sMax, 255);
-//	      cv::createTrackbar("Val Min", "Tracking", &vMin, 255);
-//	      cv::createTrackbar("Val MaX", "Tracking", &vMax, 255);
+	      Mat smoothed, hsvImg, t_img;
+//	      createTrackbar("Hue Min", "Tracking", &hMin, 255);
+//	      createTrackbar("Hue Max", "Tracking", &hMax, 255);
+//	      createTrackbar("Sat Min", "Tracking", &sMin, 255);
+//	      createTrackbar("Sat Max", "Tracking", &sMax, 255);
+//	      createTrackbar("Val Min", "Tracking", &vMin, 255);
+//	      createTrackbar("Val MaX", "Tracking", &vMax, 255);
 //	      //inRange(hsv, Scalar(hMin, sMin, vMin), Scalar(hMax, sMax, vMax), bw);
 	while(ros::ok())
 	{
-		cv::Mat source = imageB;
+		Mat source = imageB;
 
-		cv::imshow(WINDOW, imageB);
-		cv::waitKey(3);
+		imshow(WINDOW, imageB);
+		waitKey(3);
 		//smoothed.create(source.rows, source.cols, source.type());
 		//cvPyrMeanShiftFiltering(&source, &smoothed, 2.0, 40.0);
-		GaussianBlur(source, smoothed, cv::Size(9,9), 2);
-		cv::cvtColor(smoothed, hsvImg, CV_BGR2HSV);
-		//cv::inRange(hsvImg,cv::Scalar(0,140,80),cv::Scalar(30,255,130),t_img);
-		cv::inRange(hsvImg, cv::Scalar(hMin, sMin, vMin), cv::Scalar(hMax, sMax, vMax), t_img);
-		//cv::floodFill(t_img,cv::Point(0,0),cv::Scalar(255,255,255));
+		GaussianBlur(source, smoothed, Size(9,9), 4);
+		cvtColor(smoothed, hsvImg, CV_BGR2HSV);
+		//inRange(hsvImg,Scalar(0,140,80),Scalar(30,255,130),t_img);
+		inRange(hsvImg, Scalar(hMin, sMin, vMin), Scalar(hMax, sMax, vMax), t_img);
+		//floodFill(t_img,Point(0,0),Scalar(255,255,255));
 //		for(int i=0;i<255;i++)
 //		{
-//			cv::inRange(hsvImg,cv::Scalar(0,140,80),cv::Scalar(30,255,130),t_img);
-//			cv::imshow("edited", t_img);
-//			if(cv::waitKey(50)!=-1)
-//					std::cout<<i<<std::endl;
+//			inRange(hsvImg,Scalar(0,140,80),Scalar(30,255,130),t_img);
+//			imshow("edited", t_img);
+//			if(waitKey(50)!=-1)
+//					cout<<i<<endl;
 //		}
 		CBlobResult blob;
 		IplImage i_img = t_img;
+		vector<Vec3f> circles;
+		HoughCircles(t_img, circles, CV_HOUGH_GRADIENT, 2, 40, 80, 40);
 		blob = CBlobResult(&i_img,NULL,0);
 		int num_blobs = blob.GetNumBlobs();
-		std::cout<< num_blobs <<std::endl;
+		cout<< num_blobs <<endl;
 	    blob.Filter(blob, B_INCLUDE, CBlobGetArea(), B_INSIDE, blob_area_absolute_min_, blob_area_absolute_max_);
 	    blob.Filter(blob, B_EXCLUDE, CBlobGetCompactness(), B_GREATER, blob_compactness_);
 	    num_blobs = blob.GetNumBlobs();
-	    std::cout<< "new" <<num_blobs <<std::endl;
+	    cout<< "new" <<num_blobs <<endl;
 	    for(int i =0;i<num_blobs;i++)
 	    {
 	    	CBlob* bl = blob.GetBlob(i);
-	    	cv::Point2d uv(CBlobGetXCenter()(*bl), CBlobGetYCenter()(*bl));
-	    	cv::circle(t_img,uv,50,cv::Scalar(255,0,0),5);
-	    	std::cout<<uv.x << "and" << uv.y <<std::endl;
+	    	Point2d uv(CBlobGetXCenter()(*bl), CBlobGetYCenter()(*bl));
+	    	//circle(t_img,uv,50,Scalar(255,0,0),5);
+	    	cout<<uv.x << "and" << uv.y <<endl;
 	    }
+
+	    cout << "Size of circles :" << circles.size()<<endl;
+	    Mat st; //= source.clone();
+	    cvtColor(t_img, st, CV_GRAY2BGR);
+	    for(size_t i = 0; i < circles.size(); i++)
+	    {
+	    	 Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
+			 int radius = cvRound(circles[i][2]);
+			 // draw the circle center
+			 circle(st, center, 3, Scalar(0,255,0), -1, 8, 0 );
+			 // draw the circle outline
+			 circle(st, center, radius, Scalar(0,0,255), 3, 8, 0 );
+	    }
+
 		//blob.Filter()
-		cv::imshow("edited", t_img);
-		cv::waitKey(3);
+		imshow("edited", st);
+		waitKey(3);
     	ros::spinOnce();
 	}
   }

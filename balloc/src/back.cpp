@@ -88,22 +88,19 @@ public:
     	namedWindow("Tracking");
 	  int hMin, hMax, sMin, sMax, vMin, vMax;
 	      hMin = 0;
-	      //hMax = 124;
-	      hMax = 255;
-	      //sMin = 95;
-	      sMin = 102;
+	      hMax = 124;
+	      sMin = 95;
 	      sMax = 255;
-	      //vMin = 139;
-	      vMin = 129;
+	      vMin = 139;
 	      vMax = 255;
 	      Mat smoothed, hsvImg, t_img;
-/*	      createTrackbar("Hue Min", "Tracking", &hMin, 255);
-	      createTrackbar("Hue Max", "Tracking", &hMax, 255);
-	      createTrackbar("Sat Min", "Tracking", &sMin, 255);
-	      createTrackbar("Sat Max", "Tracking", &sMax, 255);
-	      createTrackbar("Val Min", "Tracking", &vMin, 255);
-	      createTrackbar("Val MaX", "Tracking", &vMax, 255);
-*/	      //inRange(hsv, Scalar(hMin, sMin, vMin), Scalar(hMax, sMax, vMax), bw);
+//	      createTrackbar("Hue Min", "Tracking", &hMin, 255);
+//	      createTrackbar("Hue Max", "Tracking", &hMax, 255);
+//	      createTrackbar("Sat Min", "Tracking", &sMin, 255);
+//	      createTrackbar("Sat Max", "Tracking", &sMax, 255);
+//	      createTrackbar("Val Min", "Tracking", &vMin, 255);
+//	      createTrackbar("Val MaX", "Tracking", &vMax, 255);
+//	      //inRange(hsv, Scalar(hMin, sMin, vMin), Scalar(hMax, sMax, vMax), bw);
 	while(ros::ok())
 	{
 		Mat source = imageB;
@@ -116,7 +113,7 @@ public:
 		cvtColor(smoothed, hsvImg, CV_BGR2HSV);
 		//inRange(hsvImg,Scalar(0,140,80),Scalar(30,255,130),t_img);
 		inRange(hsvImg, Scalar(hMin, sMin, vMin), Scalar(hMax, sMax, vMax), t_img);
-		//floodFill(t_img,Point(0,0),Scalar(255,255,255));
+		floodFill(t_img,Point(0,0),Scalar(255,255,255));
 //		for(int i=0;i<255;i++)
 //		{
 //			inRange(hsvImg,Scalar(0,140,80),Scalar(30,255,130),t_img);
@@ -126,12 +123,12 @@ public:
 //		}
 		CBlobResult blob;
 		IplImage i_img = t_img;
-		//vector<Vec3f> circles;
-		//HoughCircles(t_img, circles, CV_HOUGH_GRADIENT, 2, 40, 80, 40);
+		vector<Vec3f> circles;
+		HoughCircles(t_img, circles, CV_HOUGH_GRADIENT, 2, 40, 80, 40);
 		blob = CBlobResult(&i_img,NULL,0);
 		int num_blobs = blob.GetNumBlobs();
 		cout<< num_blobs <<endl;
-	    //blob.Filter(blob, B_INCLUDE, CBlobGetArea(), B_INSIDE, blob_area_absolute_min_, blob_area_absolute_max_);
+	    blob.Filter(blob, B_INCLUDE, CBlobGetArea(), B_INSIDE, blob_area_absolute_min_, blob_area_absolute_max_);
 	    blob.Filter(blob, B_EXCLUDE, CBlobGetCompactness(), B_GREATER, blob_compactness_);
 	    num_blobs = blob.GetNumBlobs();
 	    cout<< "new" <<num_blobs <<endl;
@@ -139,12 +136,11 @@ public:
 	    {
 	    	CBlob* bl = blob.GetBlob(i);
 	    	Point2d uv(CBlobGetXCenter()(*bl), CBlobGetYCenter()(*bl));
-	   	circle(t_img,uv,50,Scalar(255,0,0),5);
-	    	//cout<<uv.x << "and" << uv.y <<endl;
+	    	//circle(t_img,uv,50,Scalar(255,0,0),5);
+	    	cout<<uv.x << "and" << uv.y <<endl;
 	    }
 
-	    //cout << "Size of circles :" << circles.size()<<endl;
-	    /*
+	    cout << "Size of circles :" << circles.size()<<endl;
 	    Mat st; //= source.clone();
 	    cvtColor(t_img, st, CV_GRAY2BGR);
 	    for(size_t i = 0; i < circles.size(); i++)
@@ -156,9 +152,9 @@ public:
 			 // draw the circle outline
 			 circle(st, center, radius, Scalar(0,0,255), 3, 8, 0 );
 	    }
-*/
+
 		//blob.Filter()
-		imshow("edited", t_img);
+		imshow("edited", st);
 		waitKey(3);
     	ros::spinOnce();
 	}

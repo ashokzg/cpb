@@ -10,6 +10,7 @@
   <url>http://ros.org/wiki/joint_states_listener</url>
   <depend package="rospy"/>
   <depend package="sensor_msgs"/>
+  <depend package="tf"/>
   <export>
      <cpp cflags=" -I${prefix}/srv_gen/cpp/include"/>
   </export>

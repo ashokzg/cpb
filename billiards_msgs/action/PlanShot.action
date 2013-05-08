@@ -1,0 +1,6 @@
+TableState state
+float32 angle_min # in radians
+float32 angle_max # in radians
+---
+ShotPlan shot
+---

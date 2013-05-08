@@ -1,0 +1,4 @@
+geometry_msgs/PoseStamped pose
+string child_frame
+---
+---

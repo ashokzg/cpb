@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/cvblobslib/include
+END
+BlobContour.h
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/cvblobslib/include/BlobContour.h
+END
+BlobLibraryConfiguration.h
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/cvblobslib/include/BlobLibraryConfiguration.h
+END
+BlobOperators.h
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/cvblobslib/include/BlobOperators.h
+END
+BlobResult.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/cvblobslib/include/BlobResult.h
+END
+Blob.h
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/cvblobslib/include/Blob.h
+END
+ComponentLabeling.h
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/cvblobslib/include/ComponentLabeling.h
+END

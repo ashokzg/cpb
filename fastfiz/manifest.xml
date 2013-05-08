@@ -1,0 +1,21 @@
+<package>
+  <description brief="A pool physics simulation">
+
+     FastFiz is a pool physics simulation developed by Alon Altman, available at http://www.stanford.edu/group/billiards/software.html#download
+
+  </description>
+  <author>Alon Altman</author>
+  <license>GPL</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://www.stanford.edu/group/billiards/software.html#download</url>
+
+  <depend package="billiards_msgs"/>
+  <depend package="fastfiz_msgs"/>
+  <depend package="roscpp"/>
+  <depend package="rospy"/>
+  <depend package="roslib"/>
+  
+  <rosdep name="libgsl"/>
+</package>
+
+

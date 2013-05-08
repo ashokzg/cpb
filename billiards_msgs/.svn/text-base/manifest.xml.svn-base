@@ -1,0 +1,17 @@
+<package>
+  <description brief="billiards_msgs">
+
+     billiards_msgs
+
+  </description>
+  <author>John Hsu</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/billiards_msgs</url>
+  
+  <depend package="geometry_msgs"/>
+  <depend package="actionlib_msgs" />
+
+</package>
+
+

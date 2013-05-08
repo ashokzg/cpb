@@ -142,6 +142,7 @@ public:
 			{
 				CBlob* bl = blob.GetBlob(i);
 				Point2d uv(CBlobGetXCenter()(*bl), CBlobGetYCenter()(*bl));
+				//Use the width as the height
 				uv.y = bl->MinY() + (bl->MaxX() - bl->MinX()) * 0.5;
 				circle(copy,uv,50,Scalar(255,0,0),5);
 

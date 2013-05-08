@@ -11,7 +11,7 @@
   <depend package="rospy"/>
   <depend package="sensor_msgs"/>
   <export>
-     <cpp cflags=" -I${prefix}/srv_gen/cpp"/>
+     <cpp cflags=" -I${prefix}/srv_gen/cpp/include"/>
   </export>
 </package>
 

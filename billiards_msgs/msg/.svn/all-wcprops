@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_msgs/msg
+END
+PocketState.msg
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_msgs/msg/PocketState.msg
+END
+ShotPlan.msg
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_msgs/msg/ShotPlan.msg
+END
+TableState.msg
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_msgs/msg/TableState.msg
+END
+BallState.msg
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_msgs/msg/BallState.msg
+END
+Constants.msg
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_msgs/msg/Constants.msg
+END

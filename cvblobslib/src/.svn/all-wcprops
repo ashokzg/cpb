@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/cvblobslib/src
+END
+BlobOperators.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/cvblobslib/src/BlobOperators.cpp
+END
+BlobResult.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/cvblobslib/src/BlobResult.cpp
+END
+Blob.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/cvblobslib/src/Blob.cpp
+END
+ComponentLabeling.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/cvblobslib/src/ComponentLabeling.cpp
+END
+BlobContour.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/cvblobslib/src/BlobContour.cpp
+END

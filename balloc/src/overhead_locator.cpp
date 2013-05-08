@@ -49,6 +49,7 @@ class ImageConverter
 	static const double blob_area_absolute_max_ = 11000;
 	static const double blob_compactness_ = 5;
 	ros::Publisher tbl_pub;
+	int whitehMin, whitehMax, whitesMin, whitesMax, whitevMin, whitevMax,whitearea_min;
 public:
 	ImageConverter() : it_(nh_)
 	{
@@ -60,6 +61,16 @@ public:
 		ros::Subscriber info_sub_ = nh_.subscribe("/camera/camera_info", 1, &ImageConverter::infoCb, this);
 		tbl_pub = nh_.advertise<billiards_msgs::TableState>("table_state", 5, true);
 
+		whitehMin = 0;
+		//hMax = 124; // night values/???
+		whitehMax = 255;
+		whitesMin = 82; //THIS VALUE HAS BEEN CHANGED FOR WHITE (Here)
+		//sMin = 126;
+		whitesMax = 90; //THIS VALUE HAS BEEN CHANGED FOR WHITE (Here)
+		whitevMin = 139;
+		//vMin = 173;
+		whitevMax = 255;
+		whitearea_min = 100;
 		namedWindow(WINDOW);
 		while(flag == false)
 		{
@@ -102,69 +113,59 @@ public:
 	Point2d white_locator()
 	{
 		namedWindow("Tracking_white");
-		int hMin, hMax, sMin, sMax, vMin, vMax,area_min;
-		hMin = 0;
-		//hMax = 124; // night values/???
-		hMax = 255;
-		sMin = 82; //THIS VALUE HAS BEEN CHANGED FOR WHITE (Here)
-		//sMin = 126;
-		sMax = 90; //THIS VALUE HAS BEEN CHANGED FOR WHITE (Here)
-		vMin = 139;
-		//vMin = 173;
-		vMax = 255;
-		area_min = 100;
+
 		Mat smoothed, hsvImg, t_img;
-		createTrackbar("blob min area","Tracking_white" ,&area_min ,1000);
-		createTrackbar("Hue Min", "Tracking_white", &hMin, 255);
-		createTrackbar("Hue Max", "Tracking_white", &hMax, 255);
-		createTrackbar("Sat Min", "Tracking_white", &sMin, 255);
-		createTrackbar("Sat Max", "Tracking_white", &sMax, 255);
-		createTrackbar("Val Min", "Tracking_white", &vMin, 255);
-		createTrackbar("Val MaX", "Tracking_white", &vMax, 255);
-			Mat source = imageB;
-			const int tbl_len = 223*5, tbl_width = 112*5;
-			Mat tblTransform;
-			Mat newTbl;
-			Point2f tlb(1251,40), trb(33,102), trt(104,667), tlt(1230,634);
-			Point2f destlb(tbl_len,0), destrb(0,0), destrt(0,tbl_width), destlt(tbl_len,tbl_width);
-			Point2f srcTbl[] = {tlb, trb, trt, tlt};
-			Point2f desTbl[] = {destrt, destlt, destlb, destrb};
-			tblTransform = getPerspectiveTransform(srcTbl, desTbl);
-			warpPerspective(source, newTbl, tblTransform, Size(tbl_len, tbl_width));
-			Mat copy1 = newTbl.clone();
+		createTrackbar("blob min area","Tracking_white" ,&whitearea_min ,1000);
+		createTrackbar("Hue Min", "Tracking_white", &whitehMin, 255);
+		createTrackbar("Hue Max", "Tracking_white", &whitehMax, 255);
+		createTrackbar("Sat Min", "Tracking_white", &whitesMin, 255);
+		createTrackbar("Sat Max", "Tracking_white", &whitesMax, 255);
+		createTrackbar("Val Min", "Tracking_white", &whitevMin, 255);
+		createTrackbar("Val MaX", "Tracking_white", &whitevMax, 255);
+		Mat source = imageB;
+		const int tbl_len = 223*5, tbl_width = 112*5;
+		Mat tblTransform;
+		Mat newTbl;
+		Point2f tlb(1251,40), trb(33,102), trt(104,667), tlt(1230,634);
+		Point2f destlb(tbl_len,0), destrb(0,0), destrt(0,tbl_width), destlt(tbl_len,tbl_width);
+		Point2f srcTbl[] = {tlb, trb, trt, tlt};
+		Point2f desTbl[] = {destrt, destlt, destlb, destrb};
+		tblTransform = getPerspectiveTransform(srcTbl, desTbl);
+		warpPerspective(source, newTbl, tblTransform, Size(tbl_len, tbl_width));
+		Mat copy1 = newTbl.clone();
 
 
-			GaussianBlur(newTbl, smoothed, Size(9,9), 4);
-			cvtColor(smoothed, hsvImg, CV_BGR2HSV);
-			inRange(hsvImg, Scalar(hMin, sMin, vMin), Scalar(hMax, sMax, vMax), t_img);
+		GaussianBlur(newTbl, smoothed, Size(9,9), 4);
+		cvtColor(smoothed, hsvImg, CV_BGR2HSV);
+		inRange(hsvImg, Scalar(whitehMin, whitesMin, whitevMin), Scalar(whitehMax, whitesMax, whitevMax), t_img);
 
-			CBlobResult blob;
-			IplImage i_img = t_img;
-			blob = CBlobResult(&i_img,NULL,0);
+		CBlobResult blob;
+		IplImage i_img = t_img;
+		blob = CBlobResult(&i_img,NULL,0);
 
-			blob.Filter(blob, B_INCLUDE, CBlobGetArea(), B_INSIDE, area_min, blob_area_absolute_max_);
+		blob.Filter(blob, B_INCLUDE, CBlobGetArea(), B_INSIDE, whitearea_min, blob_area_absolute_max_);
 
 
-				CBlob* bl = blob.GetBlob(0);
-				Point2d uv(CBlobGetXCenter()(*bl), CBlobGetYCenter()(*bl));
-				circle(copy1,uv,20,Scalar(255,0,0),5);
-				stringstream ss;
-				ss<<uv.x/5<<", "<<uv.y/5;
-				string s = ss.str();
-				int l = 1, w = 1;
-				if (uv.x>tbl_len/2)
-					l = -1;
-				if(uv.y>tbl_width/2)
-					w = -1;
-				putText(copy1, s, Point2d(uv.x+30*l, uv.y+30*w), FONT_HERSHEY_SIMPLEX,0.5, Scalar(0,255,255));
-//				imshow(WINDOW, source);
-//			waitKey(3);
+		if(blob.GetNumBlobs() < 1)
+			return Point2d(0,0);
+		CBlob* bl = blob.GetBlob(0);
+		Point2d uv(CBlobGetXCenter()(*bl), CBlobGetYCenter()(*bl));
+		circle(copy1,uv,20,Scalar(255,0,0),5);
+		stringstream ss;
+		ss<<uv.x/5<<", "<<uv.y/5;
+		string s = ss.str();
+		int l = 1, w = 1;
+		if (uv.x>tbl_len/2)
+			l = -1;
+		if(uv.y>tbl_width/2)
+			w = -1;
+		putText(copy1, s, Point2d(uv.x+30*l, uv.y+30*w), FONT_HERSHEY_SIMPLEX,0.5, Scalar(0,255,255));
 
-			imshow("edited_white", t_img);
-			waitKey(3);
+		imshow("edited_white", t_img);
+		waitKey(3);
 
-			imshow("Transformed_white", copy1);
-			waitKey(3);
+		imshow("Transformed_white", copy1);
+		waitKey(3);
 
 		return uv;
 	}
@@ -228,14 +229,6 @@ public:
 				double MaxYatMinX = CBlobGetMaxYatMinX()(*bl);
 				double MaxXatMinY = CBlobGetMinXatMinY()(*bl);
 				double MinYatMaxX = CBlobGetMinYatMaxX()(*bl);
-
-
-
-
-
-
-
-
 				circle(copy2,uv,20,Scalar(255,0,0),5);
 				stringstream ss;
 				ss<<uv.x/5<<", "<<uv.y/5;
@@ -246,8 +239,6 @@ public:
 				if(uv.y>tbl_width/2)
 					w = -1;
 				putText(copy2, s, Point2d(uv.x+30*l, uv.y+30*w), FONT_HERSHEY_SIMPLEX,0.5, Scalar(0,255,255));
-//				imshow(WINDOW, source);
-//			waitKey(3);
 
 			imshow("edited_stick", t_img);
 			waitKey(3);
@@ -258,16 +249,11 @@ public:
 		return uv;
 	}
 
-
-
-
-
-
 	void locator()
 	{
 		namedWindow("Tracking");
 		int hMin, hMax, sMin, sMax, vMin, vMax,area_min;
-		Point2d white_coord;
+		Point2d white_coord(500,500);
 		Point2d ball_coords[25];
 		hMin = 0;
 		//hMax = 124; // night values/???
@@ -290,9 +276,21 @@ public:
 		while(ros::ok())
 		{
 
-//			white_coord = white_locator();    //Getting co-ordinates of the white ball based on seperate Saturation params
-			white_coord = cueStick_locator();    //Getting co-ordinates of the white ball based on seperate Saturation params
+			billiards_msgs::TableState tblState;
+			white_coord = white_locator();    //Getting co-ordinates of the white ball based on seperate Saturation params
+//			white_coord = cueStick_locator();    //Getting co-ordinates of the white ball based on seperate Saturation params
 
+			billiards_msgs::BallState ball;
+
+			ball.group_id = 0;
+			ball.id = 0; //Cue ball has id 0
+			ball.pocketed = false;
+			ball.point.header.stamp = ros::Time::now();
+			ball.point.header.frame_id = "table";
+			ball.point.point.x = white_coord.x/500;
+			ball.point.point.y = white_coord.y/500;
+			ball.point.point.z = 0.028;    //ball radius
+			tblState.balls.push_back(ball);
 
 			Mat source = imageB;
 			const int tbl_len = 223*5, tbl_width = 112*5;
@@ -301,8 +299,7 @@ public:
 			Point2f tlb(1251,40), trb(33,102), trt(104,667), tlt(1230,634);
 			Point2f destlb(tbl_len,0), destrb(0,0), destrt(0,tbl_width), destlt(tbl_len,tbl_width);
 			Point2f srcTbl[] = {tlb, trb, trt, tlt};
-			//Point2f desTbl[] = {destlb, destrb, destrt, destlt};
-			Point2f desTbl[] = {destrt, destlt, destlb, destrb};
+			Point2f desTbl[] = {destrt, destlt, destlb, destrb}; //Order changed for rotation
 			tblTransform = getPerspectiveTransform(srcTbl, desTbl);
 			warpPerspective(source, newTbl, tblTransform, Size(tbl_len, tbl_width));
 			Mat copy = newTbl.clone();
@@ -321,7 +318,6 @@ public:
 			blob.Filter(blob, B_INCLUDE, CBlobGetArea(), B_INSIDE, area_min, blob_area_absolute_max_);
 			num_blobs = blob.GetNumBlobs();
 
-			billiards_msgs::TableState tblState;
 
 			for(int i =0;i<num_blobs;i++)
 			{
@@ -341,7 +337,7 @@ public:
 					w = -1;
 				putText(copy, s, Point2d(uv.x+30*l, uv.y+30*w), FONT_HERSHEY_SIMPLEX,0.5, Scalar(0,255,255));
 				ball.group_id = 0;
-				ball.id = i;
+				ball.id = i+1; //Start index at 1
 				ball.pocketed = false;
 				ball.point.header.stamp = ros::Time::now();
 				ball.point.header.frame_id = "table";

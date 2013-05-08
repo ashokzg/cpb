@@ -193,56 +193,59 @@ public:
 		createTrackbar("Sat Max", "Tracking_stick", &sMax, 255);
 		createTrackbar("Val Min", "Tracking_stick", &vMin, 255);
 		createTrackbar("Val MaX", "Tracking_stick", &vMax, 255);
-			Mat source = imageB;
-			const int tbl_len = 223*5, tbl_width = 112*5;
-			Mat tblTransform;
-			Mat newTbl;
-			Point2f tlb(1251,40), trb(33,102), trt(104,667), tlt(1230,634);
-			Point2f destlb(tbl_len,0), destrb(0,0), destrt(0,tbl_width), destlt(tbl_len,tbl_width);
-			Point2f srcTbl[] = {tlb, trb, trt, tlt};
-			Point2f desTbl[] = {destrt, destlt, destlb, destrb};
-			tblTransform = getPerspectiveTransform(srcTbl, desTbl);
-			warpPerspective(source, newTbl, tblTransform, Size(tbl_len, tbl_width));
-			Mat copy2 = newTbl.clone();
+
+		Mat source = imageB;
+		const int tbl_len = 223*5, tbl_width = 112*5;
+		Mat tblTransform;
+		Mat newTbl;
+		Point2f tlb(1251,40), trb(33,102), trt(104,667), tlt(1230,634);
+		Point2f destlb(tbl_len,0), destrb(0,0), destrt(0,tbl_width), destlt(tbl_len,tbl_width);
+		Point2f srcTbl[] = {tlb, trb, trt, tlt};
+		Point2f desTbl[] = {destrt, destlt, destlb, destrb};
+		tblTransform = getPerspectiveTransform(srcTbl, desTbl);
+		warpPerspective(source, newTbl, tblTransform, Size(tbl_len, tbl_width));
+		Mat copy2 = newTbl.clone();
 
 
-			GaussianBlur(newTbl, smoothed, Size(9,9), 4);
-			cvtColor(smoothed, hsvImg, CV_BGR2HSV);
-			inRange(hsvImg, Scalar(hMin, sMin, vMin), Scalar(hMax, sMax, vMax), t_img);
+		GaussianBlur(newTbl, smoothed, Size(9,9), 4);
+		cvtColor(smoothed, hsvImg, CV_BGR2HSV);
+		inRange(hsvImg, Scalar(hMin, sMin, vMin), Scalar(hMax, sMax, vMax), t_img);
 
-			CBlobResult blob;
-			IplImage i_img = t_img;
-			blob = CBlobResult(&i_img,NULL,0);
+		CBlobResult blob;
+		IplImage i_img = t_img;
+		blob = CBlobResult(&i_img,NULL,0);
 
-			blob.Filter(blob, B_INCLUDE, CBlobGetArea(), B_INSIDE, area_min, blob_area_absolute_max_);  //try changing the min area for stick, might filter out balls better
+		blob.Filter(blob, B_INCLUDE, CBlobGetArea(), B_INSIDE, area_min, blob_area_absolute_max_);  //try changing the min area for stick, might filter out balls better
 
 
-				CBlob* bl = blob.GetBlob(0);
+		CBlob* bl = blob.GetBlob(0);
 
-				Point2d uv(CBlobGetXCenter()(*bl), CBlobGetYCenter()(*bl));
+		Point2d uv(CBlobGetXCenter()(*bl), CBlobGetYCenter()(*bl));
 
-				double orientation = CBlobGetOrientation()(*bl);
-				cout<<"Orientation"<<orientation<<endl;
+		double orientation = CBlobGetOrientation()(*bl);
+		cout<<"Orientation"<<orientation<<endl;
 
 				double MaxXatMaxY = CBlobGetMaxXatMaxY()(*bl);
 				double MaxYatMinX = CBlobGetMaxYatMinX()(*bl);
 				double MaxXatMinY = CBlobGetMinXatMinY()(*bl);
 				double MinYatMaxX = CBlobGetMinYatMaxX()(*bl);
+				double MaxX = CBlobGetMaxX()(*bl);
+				double MaxY = CBlobGetMaxY()(*bl);
+				double MinX = CBlobGetMinX()(*bl);
+				double MinY = CBlobGetMinY()(*bl);
 
+		Point2d maxXY(MaxXatMaxY,MaxY), minXY(MaxX,MinYatMaxX);
 
+		circle(copy2,maxXY,10,Scalar(0,0,255),3);
+		circle(copy2,minXY,10,Scalar(0,0,255),3);
 
-
-
-
-
-
-				circle(copy2,uv,20,Scalar(255,0,0),5);
-				stringstream ss;
-				ss<<uv.x/5<<", "<<uv.y/5;
-				string s = ss.str();
-				int l = 1, w = 1;
-				if (uv.x>tbl_len/2)
-					l = -1;
+		circle(copy2,uv,20,Scalar(255,0,0),5);
+		stringstream ss;
+		ss<<uv.x/5<<", "<<uv.y/5;
+		string s = ss.str();
+		int l = 1, w = 1;
+		if (uv.x>tbl_len/2)
+			l = -1;
 				if(uv.y>tbl_width/2)
 					w = -1;
 				putText(copy2, s, Point2d(uv.x+30*l, uv.y+30*w), FONT_HERSHEY_SIMPLEX,0.5, Scalar(0,255,255));

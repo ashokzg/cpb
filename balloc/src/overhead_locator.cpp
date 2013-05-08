@@ -23,6 +23,8 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/core/core.hpp>
+#include <billiards_msgs/BallState.h>
+#include <billiards_msgs/TableState.h>
 
 using namespace cv;
 using namespace std;
@@ -46,6 +48,7 @@ class ImageConverter
 	static const double blob_area_absolute_min_ = 300;
 	static const double blob_area_absolute_max_ = 11000;
 	static const double blob_compactness_ = 5;
+	ros::Publisher tbl_pub;
 public:
 	ImageConverter() : it_(nh_)
 	{
@@ -55,7 +58,7 @@ public:
 		//image_sub_ = it_.subscribe("/prosilica/image_rect_color", 1, &ImageConverter::imageCb, this);
 		image_sub_ = it_.subscribe("/camera/image_raw", 1, &ImageConverter::imageCb, this);
 		ros::Subscriber info_sub_ = nh_.subscribe("/camera/camera_info", 1, &ImageConverter::infoCb, this);
-
+		tbl_pub = nh_.advertise<billiards_msgs::TableState>("table_state", 5, true);
 
 		namedWindow(WINDOW);
 		while(flag == false)
@@ -146,18 +149,11 @@ public:
 			blob.Filter(blob, B_INCLUDE, CBlobGetArea(), B_INSIDE, area_min, blob_area_absolute_max_);
 			num_blobs = blob.GetNumBlobs();
 
-			//cout<<"Enter cornerx, cornery: ";
-			//cin>>cornerx>>cornery;
-			//cout<<endl;
-			//circle(copy,Point2d(cornerx, cornery),5,Scalar(0,255,255),2);
-			//std::string reference_frame = "/virtual_table"; // Table frame at ball_radius above the actual table plane
-
-			//tf::StampedTransform transform;
-			//tf_.waitForTransform(reference_frame, model.tfFrame(), ros::Time(0), ros::Duration(0.5));
-			//tf_.lookupTransform(reference_frame, model.tfFrame(), ros::Time(0), transform);
+			billiards_msgs::TableState tblState;
 
 			for(int i =0;i<num_blobs;i++)
 			{
+				billiards_msgs::BallState ball;
 				CBlob* bl = blob.GetBlob(i);
 				Point2d uv(CBlobGetXCenter()(*bl), CBlobGetYCenter()(*bl));
 				//Use the width as the height
@@ -172,23 +168,17 @@ public:
 				if(uv.y>tbl_width/2)
 					w = -1;
 				putText(copy, s, Point2d(uv.x+30*l, uv.y+30*w), FONT_HERSHEY_SIMPLEX,0.5, Scalar(0,255,255));
-				cv::Point3d xyz;
-				//model.projectPixelTo3dRay(uv, xyz);
-
-				// Intersect ray with plane in virtual table frame
-				//Origin of camera frame wrt virtual table frame
-				//tf::Point P0 = transform.getOrigin();
-				//Point at end of unit ray wrt virtual table frame
-				//tf::Point P1 = transform * tf::Point(xyz.x, xyz.y, xyz.z);
-				// Origin of virtual table frame
-				//tf::Point V0 = tf::Point(0.0,0.0,0.0);
-				// normal to the table plane
-				//tf::Vector3 n(0, 0, 1);
-				// finding scaling value
-				//double scale = (n.dot(V0-P0))/(n.dot(P1-P0));
-				//tf::Point ball_pos = P0 + (P1-P0)*scale;
-				//cout <<ball_pos.x() << " " << ball_pos.y() << " " << ball_pos.z() <<endl;
+				ball.group_id = 0;
+				ball.id = i;
+				ball.pocketed = false;
+				ball.point.header.stamp = ros::Time::now();
+				ball.point.header.frame_id = "table";
+				ball.point.point.x = uv.x/500;
+				ball.point.point.y = uv.y/500;
+				ball.point.point.z = 0.028;    //ball radius
+				tblState.balls.push_back(ball);
 			}
+			tbl_pub.publish(tblState);
 			imshow(WINDOW, source);
 			waitKey(3);
 
@@ -205,7 +195,7 @@ public:
 
 int main(int argc, char** argv)
 {
-	ros::init(argc, argv, "image_converter");
+	ros::init(argc, argv, "image_converter_ashok");
 	ImageConverter ic;
 	ros::spin();
 	return 0;

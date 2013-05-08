@@ -210,18 +210,6 @@ public:
 			warpPerspective(source, newTbl, tblTransform, Size(tbl_len, tbl_width));
 			Mat copy2 = newTbl.clone();
 
-		Mat source = imageB;
-		const int tbl_len = 223*5, tbl_width = 112*5;
-		Mat tblTransform;
-		Mat newTbl;
-		Point2f tlb(1251,40), trb(33,102), trt(104,667), tlt(1230,634);
-		Point2f destlb(tbl_len,0), destrb(0,0), destrt(0,tbl_width), destlt(tbl_len,tbl_width);
-		Point2f srcTbl[] = {tlb, trb, trt, tlt};
-		Point2f desTbl[] = {destrt, destlt, destlb, destrb};
-		tblTransform = getPerspectiveTransform(srcTbl, desTbl);
-		warpPerspective(source, newTbl, tblTransform, Size(tbl_len, tbl_width));
-		Mat copy2 = newTbl.clone();
-
 			GaussianBlur(newTbl, smoothed, Size(9,9), 4);
 			cvtColor(smoothed, hsvImg, CV_BGR2HSV);
 			inRange(hsvImg, Scalar(hMin, sMin, vMin), Scalar(hMax, sMax, vMax), t_img);
@@ -235,8 +223,6 @@ public:
 		blob = CBlobResult(&i_img,NULL,0);
 
 		blob.Filter(blob, B_INCLUDE, CBlobGetArea(), B_INSIDE, area_min, blob_area_absolute_max_);  //try changing the min area for stick, might filter out balls better
-
-				CBlob* bl = blob.GetBlob(0);
 
 		CBlob* bl = blob.GetBlob(0);
 

@@ -1,0 +1,4 @@
+<launch>
+  <!-- plan_shot action server -->
+  <node name="simple_shot_planner" pkg="billiards_planner" type="simple_shot_planner_node" output="screen" />
+</launch>

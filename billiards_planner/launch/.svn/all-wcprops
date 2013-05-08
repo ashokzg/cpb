@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_planner/launch
+END
+mc_planner.launch
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_planner/launch/mc_planner.launch
+END
+simple_shot_planner.launch
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_planner/launch/simple_shot_planner.launch
+END

@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_planner
+END
+manifest.xml
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_planner/manifest.xml
+END
+mainpage.dox
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_planner/mainpage.dox
+END
+CMakeLists.txt
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_planner/CMakeLists.txt
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_planner/Makefile
+END

@@ -1,0 +1,15 @@
+<package>
+  <description brief="fastfiz_msgs">
+
+     fastfiz_msgs
+
+  </description>
+  <author>Josh Faust</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/fastfiz_msgs</url>
+  <depend package="billiards_msgs"/>
+
+</package>
+
+

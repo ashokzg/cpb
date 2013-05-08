@@ -1,0 +1,4 @@
+bool down
+geometry_msgs/PoseStamped pose
+---
+---

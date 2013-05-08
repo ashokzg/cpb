@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_msgs/action
+END
+PlaceBridge.action
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_msgs/action/PlaceBridge.action
+END
+PoseStampedToTF.action
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_msgs/action/PoseStampedToTF.action
+END
+Strike.action
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_msgs/action/Strike.action
+END
+Play.action
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_msgs/action/Play.action
+END
+GetTableState.action
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_msgs/action/GetTableState.action
+END
+PlanShot.action
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_msgs/action/PlanShot.action
+END
+LocalizeTable.action
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_msgs/action/LocalizeTable.action
+END
+SwingArms.action
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_msgs/action/SwingArms.action
+END

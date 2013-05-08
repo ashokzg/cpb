@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/fastfiz/src
+END
+AIBase.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/fastfiz/src/AIBase.cpp
+END
+FastFiz.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/fastfiz/src/FastFiz.cpp
+END
+Rules.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/fastfiz/src/Rules.cpp
+END
+Stopwatch.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/fastfiz/src/Stopwatch.cpp
+END
+Noise.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/fastfiz/src/Noise.cpp
+END
+LogFile.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/fastfiz/src/LogFile.cpp
+END

@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_planner/scripts
+END
+play_fixed.py
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_planner/scripts/play_fixed.py
+END
+test_plan_shot.py
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_planner/scripts/test_plan_shot.py
+END
+mc_planner.py
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/wg-ros-pkg/!svn/ver/53311/graveyard/billiards/billiards_planner/scripts/mc_planner.py
+END

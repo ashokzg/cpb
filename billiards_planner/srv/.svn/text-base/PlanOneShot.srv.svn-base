@@ -1,0 +1,6 @@
+int8 cue_ball_id = 0                        # cue ball id is 0
+---
+billiards_msgs/ShotPlan[] shot_plans        # array of possible shots
+billiards_msgs/BallState[] target_balls     # id of the target ball
+billiards_msgs/PocketState[] target_pockets # id of the target pocket
+float64[] scores                            # array of scores (0-1) for ranking quality of shot plans. 1 for best plans.  0 for worst plans.  <0 for invalid shots

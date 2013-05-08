@@ -65,6 +65,8 @@ public:
 		}
 
 		ImageConverter::locator();
+//		ImageConverter::cueStick_locator();
+
 	}
 
 	~ImageConverter()
@@ -95,14 +97,189 @@ public:
 		//image_pub_.publish(cv_ptr->toImageMsg());
 	}
 
-	void locator()
+
+	Point2d white_locator()
 	{
-		namedWindow("Tracking");
+		namedWindow("Tracking_white");
 		int hMin, hMax, sMin, sMax, vMin, vMax,area_min;
 		hMin = 0;
 		//hMax = 124; // night values/???
 		hMax = 255;
-		sMin = 95;
+		sMin = 82; //THIS VALUE HAS BEEN CHANGED FOR WHITE (Here)
+		//sMin = 126;
+		sMax = 90; //THIS VALUE HAS BEEN CHANGED FOR WHITE (Here)
+		vMin = 139;
+		//vMin = 173;
+		vMax = 255;
+		area_min = 100;
+		Mat smoothed, hsvImg, t_img;
+		createTrackbar("blob min area","Tracking_white" ,&area_min ,1000);
+		createTrackbar("Hue Min", "Tracking_white", &hMin, 255);
+		createTrackbar("Hue Max", "Tracking_white", &hMax, 255);
+		createTrackbar("Sat Min", "Tracking_white", &sMin, 255);
+		createTrackbar("Sat Max", "Tracking_white", &sMax, 255);
+		createTrackbar("Val Min", "Tracking_white", &vMin, 255);
+		createTrackbar("Val MaX", "Tracking_white", &vMax, 255);
+			Mat source = imageB;
+			const int tbl_len = 223*5, tbl_width = 112*5;
+			Mat tblTransform;
+			Mat newTbl;
+			Point2f tlb(1251,40), trb(33,102), trt(104,667), tlt(1230,634);
+			Point2f destlb(tbl_len,0), destrb(0,0), destrt(0,tbl_width), destlt(tbl_len,tbl_width);
+			Point2f srcTbl[] = {tlb, trb, trt, tlt};
+			Point2f desTbl[] = {destrt, destlt, destlb, destrb};
+			tblTransform = getPerspectiveTransform(srcTbl, desTbl);
+			warpPerspective(source, newTbl, tblTransform, Size(tbl_len, tbl_width));
+			Mat copy1 = newTbl.clone();
+
+
+			GaussianBlur(newTbl, smoothed, Size(9,9), 4);
+			cvtColor(smoothed, hsvImg, CV_BGR2HSV);
+			inRange(hsvImg, Scalar(hMin, sMin, vMin), Scalar(hMax, sMax, vMax), t_img);
+
+			CBlobResult blob;
+			IplImage i_img = t_img;
+			blob = CBlobResult(&i_img,NULL,0);
+
+			blob.Filter(blob, B_INCLUDE, CBlobGetArea(), B_INSIDE, area_min, blob_area_absolute_max_);
+
+
+				CBlob* bl = blob.GetBlob(0);
+				Point2d uv(CBlobGetXCenter()(*bl), CBlobGetYCenter()(*bl));
+				circle(copy1,uv,20,Scalar(255,0,0),5);
+				stringstream ss;
+				ss<<uv.x/5<<", "<<uv.y/5;
+				string s = ss.str();
+				int l = 1, w = 1;
+				if (uv.x>tbl_len/2)
+					l = -1;
+				if(uv.y>tbl_width/2)
+					w = -1;
+				putText(copy1, s, Point2d(uv.x+30*l, uv.y+30*w), FONT_HERSHEY_SIMPLEX,0.5, Scalar(0,255,255));
+//				imshow(WINDOW, source);
+//			waitKey(3);
+
+			imshow("edited_white", t_img);
+			waitKey(3);
+
+			imshow("Transformed_white", copy1);
+			waitKey(3);
+
+		return uv;
+	}
+
+
+
+	Point2d cueStick_locator()
+	{
+		namedWindow("Tracking_stick");
+		int hMin, hMax, sMin, sMax, vMin, vMax,area_min;
+		hMin = 0;
+		//hMax = 124; // night values/???
+		hMax = 255;
+		sMin = 111; //THIS VALUE HAS BEEN CHANGED FOR WHITE (Here)
+		//sMin = 126;
+		sMax = 160; //THIS VALUE HAS BEEN CHANGED FOR WHITE (Here)
+		vMin = 145;
+		//vMin = 173;
+		vMax = 255;
+		area_min = 100;
+		Mat smoothed, hsvImg, t_img;
+		createTrackbar("blob min area","Tracking_stick" ,&area_min ,10000);
+		createTrackbar("Hue Min", "Tracking_stick", &hMin, 255);
+		createTrackbar("Hue Max", "Tracking_stick", &hMax, 255);
+		createTrackbar("Sat Min", "Tracking_stick", &sMin, 255);
+		createTrackbar("Sat Max", "Tracking_stick", &sMax, 255);
+		createTrackbar("Val Min", "Tracking_stick", &vMin, 255);
+		createTrackbar("Val MaX", "Tracking_stick", &vMax, 255);
+			Mat source = imageB;
+			const int tbl_len = 223*5, tbl_width = 112*5;
+			Mat tblTransform;
+			Mat newTbl;
+			Point2f tlb(1251,40), trb(33,102), trt(104,667), tlt(1230,634);
+			Point2f destlb(tbl_len,0), destrb(0,0), destrt(0,tbl_width), destlt(tbl_len,tbl_width);
+			Point2f srcTbl[] = {tlb, trb, trt, tlt};
+			Point2f desTbl[] = {destrt, destlt, destlb, destrb};
+			tblTransform = getPerspectiveTransform(srcTbl, desTbl);
+			warpPerspective(source, newTbl, tblTransform, Size(tbl_len, tbl_width));
+			Mat copy2 = newTbl.clone();
+
+
+			GaussianBlur(newTbl, smoothed, Size(9,9), 4);
+			cvtColor(smoothed, hsvImg, CV_BGR2HSV);
+			inRange(hsvImg, Scalar(hMin, sMin, vMin), Scalar(hMax, sMax, vMax), t_img);
+
+			CBlobResult blob;
+			IplImage i_img = t_img;
+			blob = CBlobResult(&i_img,NULL,0);
+
+			blob.Filter(blob, B_INCLUDE, CBlobGetArea(), B_INSIDE, area_min, blob_area_absolute_max_);  //try changing the min area for stick, might filter out balls better
+
+
+				CBlob* bl = blob.GetBlob(0);
+
+				Point2d uv(CBlobGetXCenter()(*bl), CBlobGetYCenter()(*bl));
+
+				double orientation = CBlobGetOrientation()(*bl);
+				cout<<"Orientation"<<orientation<<endl;
+
+				double MaxXatMaxY = CBlobGetMaxXatMaxY()(*bl);
+				double MaxYatMinX = CBlobGetMaxYatMinX()(*bl);
+				double MaxXatMinY = CBlobGetMinXatMinY()(*bl);
+				double MinYatMaxX = CBlobGetMinYatMaxX()(*bl);
+
+
+
+
+
+
+
+
+				circle(copy2,uv,20,Scalar(255,0,0),5);
+				stringstream ss;
+				ss<<uv.x/5<<", "<<uv.y/5;
+				string s = ss.str();
+				int l = 1, w = 1;
+				if (uv.x>tbl_len/2)
+					l = -1;
+				if(uv.y>tbl_width/2)
+					w = -1;
+				putText(copy2, s, Point2d(uv.x+30*l, uv.y+30*w), FONT_HERSHEY_SIMPLEX,0.5, Scalar(0,255,255));
+//				imshow(WINDOW, source);
+//			waitKey(3);
+
+			imshow("edited_stick", t_img);
+			waitKey(3);
+
+			imshow("Transformed_stick", copy2);
+			waitKey(3);
+
+		return uv;
+	}
+
+
+
+
+
+
+	void locator()
+	{
+		namedWindow("Tracking");
+
+		//int testing;
+
+		////cout<<"x"<< white_coord.x <<"  y "<<white_coord.y;
+
+		////cout<<"Wait for input";
+		////cin>>testing;
+
+		int hMin, hMax, sMin, sMax, vMin, vMax,area_min;
+		Point2d white_coord;
+		Point2d ball_coords[25];
+		hMin = 0;
+		//hMax = 124; // night values/???
+		hMax = 255;
+		sMin = 160;
 		//sMin = 126;
 		sMax = 255;
 		vMin = 139;
@@ -119,6 +296,11 @@ public:
 		createTrackbar("Val MaX", "Tracking", &vMax, 255);
 		while(ros::ok())
 		{
+
+//			white_coord = white_locator();    //Getting co-ordinates of the white ball based on seperate Saturation params
+			white_coord = cueStick_locator();    //Getting co-ordinates of the white ball based on seperate Saturation params
+
+
 			Mat source = imageB;
 			const int tbl_len = 223*5, tbl_width = 112*5;
 			Mat tblTransform;
@@ -131,8 +313,8 @@ public:
 			tblTransform = getPerspectiveTransform(srcTbl, desTbl);
 			warpPerspective(source, newTbl, tblTransform, Size(tbl_len, tbl_width));
 			Mat copy = newTbl.clone();
-			rectangle(source, trb, tlt, Scalar(0,255,255),1);
-			rectangle(source, tlb, trt, Scalar(0,255,255),1);
+//			rectangle(source, trb, tlt, Scalar(0,255,255),1);
+//			rectangle(source, tlb, trt, Scalar(0,255,255),1);
 
 			GaussianBlur(newTbl, smoothed, Size(9,9), 4);
 			cvtColor(smoothed, hsvImg, CV_BGR2HSV);
@@ -188,6 +370,8 @@ public:
 				//double scale = (n.dot(V0-P0))/(n.dot(P1-P0));
 				//tf::Point ball_pos = P0 + (P1-P0)*scale;
 				//cout <<ball_pos.x() << " " << ball_pos.y() << " " << ball_pos.z() <<endl;
+
+				ball_coords[i] = uv;
 			}
 			imshow(WINDOW, source);
 			waitKey(3);

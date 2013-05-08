@@ -26,6 +26,7 @@
 #include <billiards_msgs/BallState.h>
 #include <billiards_msgs/TableState.h>
 
+#define BALL_DEBUG 0
 using namespace cv;
 using namespace std;
 namespace enc = sensor_msgs::image_encodings;
@@ -50,6 +51,7 @@ class ImageConverter
 	static const double blob_compactness_ = 5;
 	ros::Publisher tbl_pub;
 	int whitehMin, whitehMax, whitesMin, whitesMax, whitevMin, whitevMax,whitearea_min;
+	static const int tbl_len = 223*5, tbl_width = 112*5;
 public:
 	ImageConverter() : it_(nh_)
 	{
@@ -64,14 +66,14 @@ public:
 		whitehMin = 0;
 		//hMax = 124; // night values/???
 		whitehMax = 255;
-		whitesMin = 82; //THIS VALUE HAS BEEN CHANGED FOR WHITE (Here)
+		whitesMin = 57; //THIS VALUE HAS BEEN CHANGED FOR WHITE (Here)
 		//sMin = 126;
 		whitesMax = 90; //THIS VALUE HAS BEEN CHANGED FOR WHITE (Here)
-		whitevMin = 139;
+		whitevMin = 199;
 		//vMin = 173;
 		whitevMax = 255;
 		whitearea_min = 100;
-		namedWindow(WINDOW);
+		//namedWindow(WINDOW);
 		while(flag == false)
 		{
 			loop_rate.sleep();
@@ -112,9 +114,10 @@ public:
 
 	Point2d white_locator()
 	{
-		namedWindow("Tracking_white");
+		//namedWindow("Tracking_white");
 
 		Mat smoothed, hsvImg, t_img;
+#if BALL_DEBUG == 1
 		createTrackbar("blob min area","Tracking_white" ,&whitearea_min ,1000);
 		createTrackbar("Hue Min", "Tracking_white", &whitehMin, 255);
 		createTrackbar("Hue Max", "Tracking_white", &whitehMax, 255);
@@ -122,6 +125,7 @@ public:
 		createTrackbar("Sat Max", "Tracking_white", &whitesMax, 255);
 		createTrackbar("Val Min", "Tracking_white", &whitevMin, 255);
 		createTrackbar("Val MaX", "Tracking_white", &whitevMax, 255);
+#endif
 		Mat source = imageB;
 		const int tbl_len = 223*5, tbl_width = 112*5;
 		Mat tblTransform;
@@ -160,13 +164,13 @@ public:
 		if(uv.y>tbl_width/2)
 			w = -1;
 		putText(copy1, s, Point2d(uv.x+30*l, uv.y+30*w), FONT_HERSHEY_SIMPLEX,0.5, Scalar(0,255,255));
-
+#if BALL_DEBUG == 1
 		imshow("edited_white", t_img);
 		waitKey(3);
 
 		imshow("Transformed_white", copy1);
 		waitKey(3);
-
+#endif
 		return uv;
 	}
 
@@ -174,7 +178,7 @@ public:
 
 	Point2d cueStick_locator()
 	{
-		namedWindow("Tracking_stick");
+		//namedWindow("Tracking_stick");
 		int hMin, hMax, sMin, sMax, vMin, vMax,area_min;
 		hMin = 0;
 		//hMax = 124; // night values/???
@@ -249,9 +253,34 @@ public:
 		return uv;
 	}
 
+	billiards_msgs::BallState addBall(Mat copy, Point2d uv, int id)
+	{
+		//Use the width as the height
+		//uv.y = bl->MinY() + (bl->MaxX() - bl->MinX()) * 0.5;
+		circle(copy,uv,20,Scalar(255,0,0),5);
+		stringstream ss;
+		ss<<uv.x/5<<", "<<uv.y/5;
+		string s = ss.str();
+		int l = 1, w = 1;
+		if (uv.x>tbl_len/2)
+			l = -1;
+		if(uv.y>tbl_width/2)
+			w = -1;
+		putText(copy, s, Point2d(uv.x+30*l, uv.y+30*w), FONT_HERSHEY_SIMPLEX,0.5, Scalar(0,255,255));
+		billiards_msgs::BallState ball;
+		ball.group_id = 0;
+		ball.id = id+1; //Start index at 1
+		ball.pocketed = false;
+		ball.point.header.stamp = ros::Time::now();
+		ball.point.header.frame_id = "table";
+		ball.point.point.x = uv.x/500;
+		ball.point.point.y = uv.y/500;
+		ball.point.point.z = 0.028;    //ball radius
+		return ball;
+	}
 	void locator()
 	{
-		namedWindow("Tracking");
+		//namedWindow("Tracking");
 		int hMin, hMax, sMin, sMax, vMin, vMax,area_min;
 		Point2d white_coord(500,500);
 		Point2d ball_coords[25];
@@ -266,6 +295,7 @@ public:
 		vMax = 255;
 		area_min = 100;
 		Mat smoothed, hsvImg, t_img;
+#if BALL_DEBUG == 1
 		createTrackbar("blob min area","Tracking" ,&area_min ,1000);
 		createTrackbar("Hue Min", "Tracking", &hMin, 255);
 		createTrackbar("Hue Max", "Tracking", &hMax, 255);
@@ -273,6 +303,7 @@ public:
 		createTrackbar("Sat Max", "Tracking", &sMax, 255);
 		createTrackbar("Val Min", "Tracking", &vMin, 255);
 		createTrackbar("Val MaX", "Tracking", &vMax, 255);
+#endif
 		while(ros::ok())
 		{
 
@@ -280,20 +311,7 @@ public:
 			white_coord = white_locator();    //Getting co-ordinates of the white ball based on seperate Saturation params
 //			white_coord = cueStick_locator();    //Getting co-ordinates of the white ball based on seperate Saturation params
 
-			billiards_msgs::BallState ball;
-
-			ball.group_id = 0;
-			ball.id = 0; //Cue ball has id 0
-			ball.pocketed = false;
-			ball.point.header.stamp = ros::Time::now();
-			ball.point.header.frame_id = "table";
-			ball.point.point.x = white_coord.x/500;
-			ball.point.point.y = white_coord.y/500;
-			ball.point.point.z = 0.028;    //ball radius
-			tblState.balls.push_back(ball);
-
 			Mat source = imageB;
-			const int tbl_len = 223*5, tbl_width = 112*5;
 			Mat tblTransform;
 			Mat newTbl;
 			Point2f tlb(1251,40), trb(33,102), trt(104,667), tlt(1230,634);
@@ -317,42 +335,23 @@ public:
 
 			blob.Filter(blob, B_INCLUDE, CBlobGetArea(), B_INSIDE, area_min, blob_area_absolute_max_);
 			num_blobs = blob.GetNumBlobs();
-
+			tblState.balls.push_back(addBall(copy, white_coord, 0));
 
 			for(int i =0;i<num_blobs;i++)
 			{
 				billiards_msgs::BallState ball;
 				CBlob* bl = blob.GetBlob(i);
 				Point2d uv(CBlobGetXCenter()(*bl), CBlobGetYCenter()(*bl));
-				//Use the width as the height
-				//uv.y = bl->MinY() + (bl->MaxX() - bl->MinX()) * 0.5;
-				circle(copy,uv,20,Scalar(255,0,0),5);
-				stringstream ss;
-				ss<<uv.x/5<<", "<<uv.y/5;
-				string s = ss.str();
-				int l = 1, w = 1;
-				if (uv.x>tbl_len/2)
-					l = -1;
-				if(uv.y>tbl_width/2)
-					w = -1;
-				putText(copy, s, Point2d(uv.x+30*l, uv.y+30*w), FONT_HERSHEY_SIMPLEX,0.5, Scalar(0,255,255));
-				ball.group_id = 0;
-				ball.id = i+1; //Start index at 1
-				ball.pocketed = false;
-				ball.point.header.stamp = ros::Time::now();
-				ball.point.header.frame_id = "table";
-				ball.point.point.x = uv.x/500;
-				ball.point.point.y = uv.y/500;
-				ball.point.point.z = 0.028;    //ball radius
-				tblState.balls.push_back(ball);
+				tblState.balls.push_back(addBall(copy, uv, i+1));
 			}
 			tbl_pub.publish(tblState);
+#if BALL_DEBUG == 1
 			imshow(WINDOW, source);
 			waitKey(3);
 
 			imshow("edited", t_img);
 			waitKey(3);
-
+#endif
 			imshow("Transformed", copy);
 			waitKey(3);
 

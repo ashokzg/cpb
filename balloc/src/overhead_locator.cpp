@@ -193,7 +193,7 @@ public:
 
 	Point2d cueStick_locator()
 	{
-		//namedWindow("Tracking_stick");
+		namedWindow("Tracking_stick");
 		int hMin, hMax, sMin, sMax, vMin, vMax,area_min;
 		hMin = 0;
 		//hMax = 124; // night values/???
@@ -225,39 +225,53 @@ public:
 			warpPerspective(source, newTbl, tblTransform, Size(tbl_len, tbl_width));
 			Mat copy2 = newTbl.clone();
 
-
 			GaussianBlur(newTbl, smoothed, Size(9,9), 4);
 			cvtColor(smoothed, hsvImg, CV_BGR2HSV);
 			inRange(hsvImg, Scalar(hMin, sMin, vMin), Scalar(hMax, sMax, vMax), t_img);
 
-			CBlobResult blob;
-			IplImage i_img = t_img;
-			blob = CBlobResult(&i_img,NULL,0);
+		GaussianBlur(newTbl, smoothed, Size(9,9), 4);
+		cvtColor(smoothed, hsvImg, CV_BGR2HSV);
+		inRange(hsvImg, Scalar(hMin, sMin, vMin), Scalar(hMax, sMax, vMax), t_img);
 
-			blob.Filter(blob, B_INCLUDE, CBlobGetArea(), B_INSIDE, area_min, blob_area_absolute_max_);  //try changing the min area for stick, might filter out balls better
+		CBlobResult blob;
+		IplImage i_img = t_img;
+		blob = CBlobResult(&i_img,NULL,0);
 
+		blob.Filter(blob, B_INCLUDE, CBlobGetArea(), B_INSIDE, area_min, blob_area_absolute_max_);  //try changing the min area for stick, might filter out balls better
 
-				CBlob* bl = blob.GetBlob(0);
+		CBlob* bl = blob.GetBlob(0);
 
-				Point2d uv(CBlobGetXCenter()(*bl), CBlobGetYCenter()(*bl));
+		Point2d uv(CBlobGetXCenter()(*bl), CBlobGetYCenter()(*bl));
 
-				double orientation = CBlobGetOrientation()(*bl);
-				cout<<"Orientation"<<orientation<<endl;
+		double orientation = CBlobGetOrientation()(*bl);
+		cout<<"Orientation"<<orientation<<endl;
 
 				double MaxXatMaxY = CBlobGetMaxXatMaxY()(*bl);
 				double MaxYatMinX = CBlobGetMaxYatMinX()(*bl);
 				double MaxXatMinY = CBlobGetMinXatMinY()(*bl);
 				double MinYatMaxX = CBlobGetMinYatMaxX()(*bl);
-				circle(copy2,uv,20,Scalar(255,0,0),5);
-				stringstream ss;
-				ss<<uv.x/5<<", "<<uv.y/5;
-				string s = ss.str();
-				int l = 1, w = 1;
-				if (uv.x>tbl_len/2)
-					l = -1;
+				double MaxX = CBlobGetMaxX()(*bl);
+				double MaxY = CBlobGetMaxY()(*bl);
+				double MinX = CBlobGetMinX()(*bl);
+				double MinY = CBlobGetMinY()(*bl);
+
+		Point2d maxXY(MaxXatMaxY,MaxY), minXY(MaxX,MinYatMaxX);
+
+		circle(copy2,maxXY,10,Scalar(0,0,255),3);
+		circle(copy2,minXY,10,Scalar(0,0,255),3);
+
+		circle(copy2,uv,20,Scalar(255,0,0),5);
+		stringstream ss;
+		ss<<uv.x/5<<", "<<uv.y/5;
+		string s = ss.str();
+		int l = 1, w = 1;
+		if (uv.x>tbl_len/2)
+			l = -1;
 				if(uv.y>tbl_width/2)
 					w = -1;
 				putText(copy2, s, Point2d(uv.x+30*l, uv.y+30*w), FONT_HERSHEY_SIMPLEX,0.5, Scalar(0,255,255));
+//				imshow(WINDOW, source);
+//			waitKey(3);
 
 			imshow("edited_stick", t_img);
 			waitKey(3);
@@ -357,6 +371,7 @@ public:
 //			white_coord = cueStick_locator();    //Getting co-ordinates of the white ball based on seperate Saturation params
 
 			Mat source = imageB;
+			const int tbl_len = 223*5, tbl_width = 112*5;
 			Mat tblTransform;
 			Mat newTbl;
 			Point2f tlb(1251,40), trb(33,102), trt(104,667), tlt(1230,634);

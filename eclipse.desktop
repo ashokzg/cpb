@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Eclipse
+Comment=Eclipse Integrated Development Environment
+Icon=/usr/share/eclipse/dropins/sdk/plugins/org.eclipse.sdk_3.7.2.dist/eclipse48.png
+Exec=bash -i -c /usr/lib/eclipse/eclipse
+Terminal=false
+Categories=Development;IDE;Java;

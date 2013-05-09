@@ -16,7 +16,10 @@ def bill_planner_client(tbl_state):
 
     # Waits until the action server has started up and started
     # listening for goals.
-    client.wait_for_server()
+    if client.wait_for_server() == False:
+        print "Server not available"
+    else:
+        print "Found server"
 
     # Creates a goal to send to the action server.
     goal = billiards_msgs.msg.PlanShotActionGoal()

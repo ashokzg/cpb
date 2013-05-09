@@ -20,6 +20,7 @@
   <depend package="fastfiz"/>
   <depend package="billiards_msgs"/>
   <depend package="billiards_planner"/>
+  <export><cpp cflags=" -I${prefix}/srv_gen/cpp/include"/></export>  
 </package>
 
 

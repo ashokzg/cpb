@@ -26,6 +26,21 @@
 #include <billiards_msgs/BallState.h>
 #include <billiards_msgs/TableState.h>
 
+//Shot calculation
+#include<std_msgs/Header.h>
+#include<billiards_msgs/BallState.h>
+#include<billiards_msgs/TableState.h>
+#include<billiards_msgs/ShotPlan.h>
+//#include<billiards_planner/PlanOneShot.h>
+
+#include <actionlib/client/simple_action_client.h>
+#include <actionlib/client/terminal_state.h>
+#include <billiards_msgs/PlanShotAction.h>
+#include <billiards_msgs/Constants.h>
+
+//#include <billiards_planner/simple_shot_planner.h>
+#include <boost/bind.hpp>
+
 #define BALL_DEBUG 0
 using namespace cv;
 using namespace std;
@@ -269,7 +284,7 @@ public:
 		putText(copy, s, Point2d(uv.x+30*l, uv.y+30*w), FONT_HERSHEY_SIMPLEX,0.5, Scalar(0,255,255));
 		billiards_msgs::BallState ball;
 		ball.group_id = 0;
-		ball.id = id+1; //Start index at 1
+		ball.id = id; //Start index at 1
 		ball.pocketed = false;
 		ball.point.header.stamp = ros::Time::now();
 		ball.point.header.frame_id = "table";
@@ -278,6 +293,36 @@ public:
 		ball.point.point.z = 0.028;    //ball radius
 		return ball;
 	}
+
+	bool check_action(billiards_msgs::TableState ts,double angle_min,double angle_max)
+	{
+	  actionlib::SimpleActionClient<billiards_msgs::PlanShotAction> action_client("plan_shot", true);
+	  action_client.waitForServer();
+
+	  ROS_INFO("plan_shot action server is up, sending goal");
+	  billiards_msgs::PlanShotGoal goal;
+	  goal.state = ts;
+	  goal.angle_min = angle_min;
+	  goal.angle_max = angle_max;
+	  action_client.sendGoal(goal);
+
+	  //wait for the action to return
+	  bool finished_before_timeout = action_client.waitForResult(ros::Duration(300.0));
+
+	  if (finished_before_timeout)
+	  {
+	    actionlib::SimpleClientGoalState state = action_client.getState();
+	    ROS_INFO("Action finished: %s",state.toString().c_str());
+	    return (state == actionlib::SimpleClientGoalState::SUCCEEDED);
+	  }
+	  else
+	  {
+	    ROS_INFO("Action did not finish before the time out.");
+	    return false;
+	  }
+
+	}
+
 	void locator()
 	{
 		//namedWindow("Tracking");
@@ -344,6 +389,7 @@ public:
 				Point2d uv(CBlobGetXCenter()(*bl), CBlobGetYCenter()(*bl));
 				tblState.balls.push_back(addBall(copy, uv, i+1));
 			}
+			cout<<"Publishing table state"<<endl;
 			tbl_pub.publish(tblState);
 #if BALL_DEBUG == 1
 			imshow(WINDOW, source);
@@ -354,6 +400,8 @@ public:
 #endif
 			imshow("Transformed", copy);
 			waitKey(3);
+
+			check_action(tblState, -180, 180);
 
 			ros::spinOnce();
 		}

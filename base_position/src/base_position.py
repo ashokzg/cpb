@@ -22,7 +22,7 @@ table_width = 1.3592
 bridge_bottom_height = 0.06 + 0.2
 
 #transform of base in bridge frame by looking up tf echo l_wrist_roll_link  base_footprint
-## WTF!?!?!?!
+## WTF!?!?!?!--- LOL nikhil, that was a crude approximation Ashok and I did, sorry abt that
 '''
 tfbb = Pose()
 tfbb.position.x=1.237

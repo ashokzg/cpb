@@ -20,21 +20,29 @@ float32 BRIDGE_THICKNESS = 0.02
 
 float32 ROBOT_RADIUS = 0.40
 
+#Translation: [0.423, 0.758, 0.921]
+#- Rotation: in Quaternion [-0.536, -0.452, 0.538, -0.468]
+#            in RPY [0.721, 1.549, -1.004]
 
 ### Constraint on the offset of the base from the bridge
-float32 BRIDGE_IN_BASE_X = 0.295
-float32 BRIDGE_IN_BASE_Y = 0.860
-float32 BRIDGE_IN_BASE_Z = 0.710  # Use TABLE_HEIGHT - 0.051 (<-- base_link height)
+float32 BRIDGE_IN_BASE_X = 0.428 #0.295 428
+float32 BRIDGE_IN_BASE_Y = 0.753 #0.860 753
+float32 BRIDGE_IN_BASE_Z = 0.918 #0.710 918 # Use TABLE_HEIGHT - 0.051 (<-- base_link height)
 
+#CMU CPB VALUES
+float32 BRIDGE_IN_BASE_QX = -0.539  #539
+float32 BRIDGE_IN_BASE_QY = -0.449  #449
+float32 BRIDGE_IN_BASE_QZ = 0.540   #540
+float32 BRIDGE_IN_BASE_QW = -0.466  #466
 # 90 degrees to the base
 #float32 BRIDGE_IN_BASE_QX = 0.0
 #float32 BRIDGE_IN_BASE_QY = 0.0
 #float32 BRIDGE_IN_BASE_QZ = 0.7071
 #float32 BRIDGE_IN_BASE_QW = 0.7071
 # 100 degrees to the base
-float32 BRIDGE_IN_BASE_QX = 0.0
-float32 BRIDGE_IN_BASE_QY = 0.0
-float32 BRIDGE_IN_BASE_QZ = 0.766
-float32 BRIDGE_IN_BASE_QW = 0.643
+#float32 BRIDGE_IN_BASE_QX = 0.0
+#float32 BRIDGE_IN_BASE_QY = 0.0
+#float32 BRIDGE_IN_BASE_QZ = 0.766
+#float32 BRIDGE_IN_BASE_QW = 0.643
 
 float32 CUE_AZIMUTH = 0.0524  # Radians

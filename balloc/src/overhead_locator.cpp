@@ -2,6 +2,7 @@
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
 #include <tf/transform_listener.h>
+#include <tf/transform_broadcaster.h>
 
 // Msg->OpenCV
 #include <cv_bridge/CvBridge.h>
@@ -74,8 +75,8 @@ public:
 		flag = false;
 		image_pub_ = it_.advertise("out", 1);
 		//image_sub_ = it_.subscribe("/prosilica/image_rect_color", 1, &ImageConverter::imageCb, this);
-		image_sub_ = it_.subscribe("/camera/image_raw", 1, &ImageConverter::imageCb, this);
-		ros::Subscriber info_sub_ = nh_.subscribe("/camera/camera_info", 1, &ImageConverter::infoCb, this);
+		image_sub_ = it_.subscribe("/camera1/image_raw", 1, &ImageConverter::imageCb, this);
+		ros::Subscriber info_sub_ = nh_.subscribe("/camera1/camera_info", 1, &ImageConverter::infoCb, this);
 		tbl_pub = nh_.advertise<billiards_msgs::TableState>("table_state", 5, true);
 
 		whitehMin = 0;
@@ -145,10 +146,14 @@ public:
 		const int tbl_len = 223*5, tbl_width = 112*5;
 		Mat tblTransform;
 		Mat newTbl;
-		Point2f tlb(1251,40), trb(33,102), trt(104,667), tlt(1230,634);
-		Point2f destlb(tbl_len,0), destrb(0,0), destrt(0,tbl_width), destlt(tbl_len,tbl_width);
-		Point2f srcTbl[] = {tlb, trb, trt, tlt};
-		Point2f desTbl[] = {destrt, destlt, destlb, destrb};
+			Point2f tlb(1251,40), trb(33,102), trt(104,667), tlt(1230,634);
+			Point2f destlb(tbl_len,0), destrb(0,0), destrt(0,tbl_width), destlt(tbl_len,tbl_width);
+			Point2f srcTbl[] = {tlb, trb, trt, tlt};
+			Point2f desTbl[] = {destrb, destlb, destlt, destrt}; //Order changed for rotation
+		//Point2f tlb(1251,40), trb(33,102), trt(104,667), tlt(1230,634);
+		//Point2f destlb(tbl_len,0), destrb(0,0), destrt(0,tbl_width), destlt(tbl_len,tbl_width);
+		//Point2f srcTbl[] = {tlb, trb, trt, tlt};
+		//Point2f desTbl[] = {destrt, destlt, destlb, destrb};
 		tblTransform = getPerspectiveTransform(srcTbl, desTbl);
 		warpPerspective(source, newTbl, tblTransform, Size(tbl_len, tbl_width));
 		Mat copy1 = newTbl.clone();
@@ -217,10 +222,10 @@ public:
 			const int tbl_len = 223*5, tbl_width = 112*5;
 			Mat tblTransform;
 			Mat newTbl;
-			Point2f tlb(1251,40), trb(33,102), trt(104,667), tlt(1230,634);
-			Point2f destlb(tbl_len,0), destrb(0,0), destrt(0,tbl_width), destlt(tbl_len,tbl_width);
+			Point2f trt(1251,40), tlt(33,102), tlb(104,667), trb(1230,634);
+			Point2f destrt(tbl_len,0), destlt(0,0), destlb(0,tbl_width), destrb(tbl_len,tbl_width);
 			Point2f srcTbl[] = {tlb, trb, trt, tlt};
-			Point2f desTbl[] = {destrt, destlt, destlb, destrb};
+			Point2f desTbl[] = {destlb, destrb, destrt, destlt};
 			tblTransform = getPerspectiveTransform(srcTbl, desTbl);
 			warpPerspective(source, newTbl, tblTransform, Size(tbl_len, tbl_width));
 			Mat copy2 = newTbl.clone();
@@ -286,6 +291,7 @@ public:
 	{
 		//Use the width as the height
 		//uv.y = bl->MinY() + (bl->MaxX() - bl->MinX()) * 0.5;
+		//uv.y = 560-uv.y;
 		circle(copy,uv,20,Scalar(255,0,0),5);
 		stringstream ss;
 		ss<<uv.x/5<<", "<<uv.y/5;
@@ -311,8 +317,10 @@ public:
 	bool check_action(billiards_msgs::TableState ts,double angle_min,double angle_max)
 	{
 	  actionlib::SimpleActionClient<billiards_msgs::PlanShotAction> action_client("plan_shot", true);
+	  cout<<"WAITING FOR ACTION SERVER"<<endl;
 	  action_client.waitForServer();
 
+	  cout<< "plan_shot action server is up, sending goal"<<endl;
 	  ROS_INFO("plan_shot action server is up, sending goal");
 	  billiards_msgs::PlanShotGoal goal;
 	  goal.state = ts;
@@ -327,6 +335,17 @@ public:
 	  {
 	    actionlib::SimpleClientGoalState state = action_client.getState();
 	    ROS_INFO("Action finished: %s",state.toString().c_str());
+	    billiards_msgs::PlanShotResultConstPtr result = action_client.getResult();
+	    cout<<"PUBLISHING TF NOW ---- RESULT VELOCITY - - - > "<< result->shot.velocity << endl;
+
+	    tf::Transform bridge_pose, base_pose;
+	    
+	    bridge_pose.setOrigin(tf::Vector3(result->shot.bridge_pose.pose.position.x, result->shot.bridge_pose.pose.position.y, result->shot.bridge_pose.pose.position.z) );
+	    bridge_pose.setRotation(tf::Quaternion(result->shot.bridge_pose.pose.orientation.x, result->shot.bridge_pose.pose.orientation.y, result->shot.bridge_pose.pose.orientation.z, result->shot.bridge_pose.pose.orientation.w));			
+
+	    tf::TransformBroadcaster pub;
+	    pub.sendTransform(tf::StampedTransform(bridge_pose,ros::Time::now(),"/table","/des_bridge"));
+	     
 	    return (state == actionlib::SimpleClientGoalState::SUCCEEDED);
 	  }
 	  else
@@ -377,7 +396,7 @@ public:
 			Point2f tlb(1251,40), trb(33,102), trt(104,667), tlt(1230,634);
 			Point2f destlb(tbl_len,0), destrb(0,0), destrt(0,tbl_width), destlt(tbl_len,tbl_width);
 			Point2f srcTbl[] = {tlb, trb, trt, tlt};
-			Point2f desTbl[] = {destrt, destlt, destlb, destrb}; //Order changed for rotation
+			Point2f desTbl[] = {destrb, destlb, destlt, destrt}; //Order changed for rotation
 			tblTransform = getPerspectiveTransform(srcTbl, desTbl);
 			warpPerspective(source, newTbl, tblTransform, Size(tbl_len, tbl_width));
 			Mat copy = newTbl.clone();
@@ -414,9 +433,14 @@ public:
 			waitKey(3);
 #endif
 			imshow("Transformed", copy);
-			waitKey(3);
+			char c = waitKey(3);
+			cout<<"CHARACTER: "<<c<<endl;
 
-			check_action(tblState, -180, 180);
+			if(c == 'p')
+			{
+				cout<<"CHECK ACTION CALLED"<<endl;
+				check_action(tblState, 0, 3.14);
+			}
 
 			ros::spinOnce();
 		}
@@ -425,7 +449,7 @@ public:
 
 int main(int argc, char** argv)
 {
-	ros::init(argc, argv, "image_converter");
+	ros::init(argc, argv, "image_converter_harsha");
 	ImageConverter ic;
 	ros::spin();
 	return 0;

@@ -4,6 +4,6 @@
   <node name="fastfiz" pkg="fastfiz" type="fastfiz_node" output="screen" />
 
   <!-- plan_shot action server -->
-  <!--node name="mc_planner" pkg="billiards_planner" type="mc_planner.py" output="screen" /-->
+  <node name="mc_planner" pkg="billiards_planner" type="mc_planner.py" output="screen" />
 
 </launch>

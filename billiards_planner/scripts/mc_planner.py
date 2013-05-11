@@ -135,7 +135,9 @@ class MCPlanner(object):
                 i += 1
 
         print 'Searching over %d possible shots...' % len(possible_shots)        
-        randomized_table_state = self.perturb_shot(table_state)
+        #randomized_table_state = self.perturb_shot(table_state)
+        randomized_table_state = [table_state]
+	
         org_table_state = copy.deepcopy(table_state)
         for shot, index in possible_shots:
             table_scores = []
@@ -148,14 +150,14 @@ class MCPlanner(object):
                 self._table_state_pub.publish(result.state)    
                 # Score it
                 score = self.score_shot(table_state, shot, result.state, result.events)
+                # Store the results
+                shot_scores.append((score, shot, index))
+                shot_results[shot] = score
+                shot_tables[shot] = result.state
             except rospy.ServiceException, ex:
                 print str(ex)
                             
             #print 'theta=%.2f v=%.2f phi=%.1f score=%3d' % (shot.theta, shot.v, shot.phi, score)
-            # Store the results
-            shot_scores.append((score, shot, index))
-            shot_results[shot] = score
-            shot_tables[shot] = result.state
 
         shot_scores = self.increase_wide_angle_shot_scores(shot_scores)
 
@@ -185,7 +187,7 @@ class MCPlanner(object):
         for ball in table_state.balls:
             if not ball.pocketed:
                 print '%d (%.2f, %.2f)' % (ball.id, ball.point.point.x, ball.point.point.y)
-
+	
         if (goal.angle_min == 0.0 and goal.angle_max == 0.0):
             angle_min_deg = 0.0
             angle_max_deg = 360.0
@@ -374,7 +376,7 @@ class MCPlanner(object):
         base_pose            = transformations.concatenate_matrices(bridge_pose, base_to_bridge)  # correct order?
         base_pose_pos        = transformations.translation_from_matrix(base_pose)
         base_pose_orient     = transformations.quaternion_from_matrix(base_pose)
-        
+        print "BASE_POSE", base_pose, "BRIDGE_POSE", bridge_pose 
         return ((bridge_pose_pos, bridge_pose_orient), (base_pose_pos, base_pose_orient))
 
     # Given the position of the cue ball, and the angle of the cue, determine where to place the bridge
@@ -404,6 +406,7 @@ class MCPlanner(object):
         return self._simulate_shot_service.call(req)
 
 if __name__ == '__main__':    
-    rospy.init_node('mc_planner')
+    rospy.init_node('mc_pl')
     planner = MCPlanner()
+    print "server started"
     rospy.spin()
